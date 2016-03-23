@@ -1,0 +1,30 @@
+{
+  "manifest_version": 2,
+
+  "name": "JIRAbus",
+  "version": "0.0.1",
+  "description": "Keyboard enhancer for Atlassian JIRA",
+  "background": {
+    "scripts": [
+      "background.js"
+    ]
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://jira.mail.ru/*"
+      ],
+      "js": [
+        "content.js"
+      ]
+    }
+  ],
+  "page_action": {
+    "default_icon": "jira.png",
+    "default_title": "JIRAbus",
+    "default_popup": "popup.html"
+  },
+  "permissions" : [
+    "tabs", "https://jira.mail.ru/*"
+  ]
+}
