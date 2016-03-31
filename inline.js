@@ -5,14 +5,39 @@ var eventHandlers = jQuery._data(document, 'events');
 console.log(eventHandlers);
 
 var KEYS = {
-  's, w': 'click #action_id_11', // В работу (Work)
-  's, r': 'click #action_id_31', // Готово (Ready)
+  's, w': [
+    'click #action_id_11',
+    'click #action_id_241',
+    'click #action_id_71'
+  ], // В работу (Work)
+  's, f': [
+    'click #action_id_31',
+    'click #action_id_81'
+  ], // Готово (Ready)
   's, p': 'click #action_id_41', // Отложить (Postpone)
-  's, v': 'click #action_id_251', // Review (Review)
-  's, o': 'click #action_id_261', // На доработку (Open)
+  's, r': [
+    'click #action_id_251',
+    'click #action_id_281'
+  ], // Review (Review), Откатить (Roll Back)
+  's, o': [
+    'click #action_id_261',
+    'click #action_id_151'
+  ], // На доработку/Открыть снова (Open)
   's, g': 'click #action_id_271', // Все хорошо (Good)
   's, t': 'click #action_id_231', // Протестировать (Testing)
-
+  's, c': [
+    'click #action_id_291',
+    'click #action_id_21',
+    'click #action_id_141'
+  ], // Закрыть (Close)
+  's, b': [
+    'click #action_id_91',
+    'click #action_id_111',
+    'click #action_id_131'
+  ], // Есть баги (Bugs)
+  's, s': 'click #action_id_101', // Протестировано (TeSted)
+  's, d': 'click #action_id_121', // Deployed on Production (Deployed)
+  'n': 'click #commit-message-copy' // Copy commit message
 };
 
 function KeyboardDispatcher(KEYS) {
@@ -30,26 +55,33 @@ function KeyboardDispatcher(KEYS) {
 
 KeyboardDispatcher.prototype._parseHotkeys = function () {
   Object.keys(KEYS).forEach((key) => {
-    this._decl.push({
-      keys: key.split(',').map(k => k.trim().toUpperCase()),
-      action: KEYS[key]
-    });
+    let actions = KEYS[key];
+    actions = Array.isArray(actions) ? actions : [actions];
+    actions.forEach(action => {
+      let hotKeyDeclaration = {
+        keysString: key,
+        keys: key.split(',').map(k => k.trim().toUpperCase()),
+        action: action,
+        targetSelector: action.split(' ')[1]
+      };
 
-    let current = this._decl[this._decl.length - 1];
-    this._queue.push({
-      keys: [...current.keys],
-      action: current.action,
-      index: this._decl.length - 1,
-      lastHit: null
-    });
+      this._decl.push(hotKeyDeclaration);
 
+      this._queue.push({
+        keys: [...hotKeyDeclaration.keys],
+        action: hotKeyDeclaration.action,
+        targetSelector: hotKeyDeclaration.targetSelector,
+        index: this._decl.length - 1,
+        lastHit: null
+      });
+    }, this);
   }, this);
 
-  var observer = new MutationObserver(function(mutations) {
+  var observer = new MutationObserver(function () {
     this._labelActions();
   }.bind(this));
 
-  observer.observe(document.body, { childList: true });
+  observer.observe(document.body, {childList: true});
 
   //observer.disconnect();
 
@@ -57,35 +89,38 @@ KeyboardDispatcher.prototype._parseHotkeys = function () {
 };
 
 KeyboardDispatcher.prototype._labelActions = function () {
-  Object.keys(KEYS).forEach((actionKey) => {
-    let action = KEYS[actionKey];
-    let targetSelector = action.split(' ')[1];
-
-    let target = document.querySelector(targetSelector);
-    debugger;
+  this._decl.forEach((decl) => {
+    let target = document.querySelector(decl.targetSelector);
     if (!target || target.getAttribute('data-jirabus')) {
       return;
     }
 
-    // TODO: надо сделать интелектуальный поиск ноды с текстом
-    jQuery(target).attr('data-jirabus', 'true')
-      .find('.trigger-label').append(
-        jQuery('<b>')
-          .text(actionKey)
-          .css('margin-left', '5px')
-      );
-  }, this)
+    let $hotkeyElement = jQuery('<b>')
+      .addClass('jirabus-hotkey')
+      .text(decl.keysString);
+
+    // TODO: надо сделать интеллектуальный поиск ноды с текстом
+    let $target = jQuery(target).attr('data-jirabus', 'true');
+    // для случая кнопок-действия
+    let $textNode = $target.find('.trigger-label');
+    if (!$textNode.length) {
+      $textNode = $target;
+    }
+
+    $textNode.append($hotkeyElement);
+
+  });
 };
 
 KeyboardDispatcher.prototype._blockExistedHandlers = function () {
   /*['keyup', 'keypress', 'keydown'].forEach(function (eventName) {
-    this._eventHandlersCache[eventName] = [];
-    (eventHandlers[eventName] || []).forEach(function (eventHandlerObj) {
-      this._eventHandlersCache[eventName].push(eventHandlerObj.handler);
-    }, this);
+   this._eventHandlersCache[eventName] = [];
+   (eventHandlers[eventName] || []).forEach(function (eventHandlerObj) {
+   this._eventHandlersCache[eventName].push(eventHandlerObj.handler);
+   }, this);
 
-    delete eventHandlers[eventName];
-  }, this);*/
+   delete eventHandlers[eventName];
+   }, this);*/
 
   ['keyup', 'keypress', 'keydown'].forEach(eventName =>
     document.addEventListener(eventName, this.processEvent.bind(this), true));
@@ -136,10 +171,20 @@ KeyboardDispatcher.prototype._cancelEvent = function (evt) {
 KeyboardDispatcher.prototype.processEvent = function (evt) {
   this.printKeyboardEvent(evt);
 
+  // пропускаем события на инпутах
+  if (jQuery(evt.target).is('textarea, input')) {
+    return;
+  }
+
   let key = String.fromCharCode(evt.which);
   let now = Date.now();
 
-  let matchedItems = this._queue.filter((item) => item.keys[0] === key);
+  // ищем хоткей, подходящий по клавишам и `target` которого присутствует на странице
+  let matchedItems =
+    this._queue.filter(
+      (item) => item.keys[0] === key && document.querySelector(item.targetSelector)
+    );
+
   if (['keydown', 'keypress', 'keyup'].includes(evt.type) && matchedItems.length) {
     this._cancelEvent(evt);
 
@@ -152,6 +197,8 @@ KeyboardDispatcher.prototype.processEvent = function (evt) {
           item.keys.shift();
           // мы добрались до конца
           if (!item.keys.length) {
+            // TODO: нужно обновлять все шорткаты, начинающиеся с одной буквы
+            // лучше с самого начала зацепленные выносить в отдельную очередь, а текущую блокировать
             this.renewShortcut(item);
 
             // здесь нужно эмитить событие, но пока сделаем так

@@ -1,23 +1,27 @@
-var SCRIPT_ID = 'jirabus-inline';
-
-function isCodeInlined() {
-  return !!document.getElementById('jirabus-inline');
+function isCodeInlined(ext) {
+  return !!document.getElementById(`jirabus-${ext}`);
 }
 
-function inlineCode(code, force) {
-  if (!force && isCodeInlined()) {
+function inlineCode(ext, code, force) {
+  if (!force && isCodeInlined(ext)) {
     return;
   }
 
-  var script = document.createElement('script');
-  script.setAttribute('id', SCRIPT_ID);
-  script.textContent = code;
+  var codeNode = document.createElement(ext === 'js' ? 'script' : 'style');
+  codeNode.setAttribute('id', `jirabus-${ext}`);
+  codeNode.textContent = code;
 
-  document.body.appendChild(script);
+  document.body.appendChild(codeNode);
 }
 
 chrome.runtime.sendMessage({ type: 'code' }, (response) => {
   console.log('content', response);
 
-  inlineCode(response);
+  Object.keys(response).forEach((fileName) => {
+    let code = response[fileName];
+    let ext = fileName.split('.');
+    ext = ext[ext.length - 1];
+
+    inlineCode(ext, code);
+  });
 });

@@ -11,7 +11,33 @@ function errorHandler() {
   console.log(arguments);
 }
 
-var INLINE_JS;
+let FILE_CACHE = {};
+
+function readFile(fileName) {
+
+  return new Promise((resolve, reject) => {
+
+    if (FILE_CACHE[fileName]) {
+      return resolve(FILE_CACHE[fileName]);
+    }
+
+    chrome.runtime.getPackageDirectoryEntry(function(root) {
+
+      root.getFile(fileName, {}, function(fileEntry) {
+
+        fileEntry.file(function(file) {
+          var reader = new FileReader();
+          reader.onloadend = function(e) {
+            FILE_CACHE[fileName] = this.result;
+
+            resolve({ [fileName]: FILE_CACHE[fileName] });
+          };
+          reader.readAsText(file);
+        }, reject);
+      }, reject);
+    });
+  })
+}
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   console.log(sender.tab ?
@@ -21,29 +47,16 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
   switch (request.type) {
     case 'code':
-      if (INLINE_JS) {
-        sendResponse(INLINE_JS);
-        return;
-      }
+      Promise.all([readFile('inline.js'), readFile('inline.css')]).then((promiseValues) => {
+        let response = Object.assign({}, ...promiseValues);
+        sendResponse(response);
+      }, errorHandler);
 
-      chrome.runtime.getPackageDirectoryEntry(function(root) {
-        root.getFile('inline.js', {}, function(fileEntry) {
-          fileEntry.file(function(file) {
-            var reader = new FileReader();
-            reader.onloadend = function(e) {
-              INLINE_JS = this.result;
-
-              sendResponse(INLINE_JS);
-              chrome.pageAction.setIcon({
-                tabId: sender.tab.id,
-                path: 'jira_light.png'
-              });
-
-            };
-            reader.readAsText(file);
-          }, errorHandler);
-        }, errorHandler);
+      chrome.pageAction.setIcon({
+        tabId: sender.tab.id,
+        path: 'jira_light.png'
       });
+      console.log('TAB', sender.tab);
 
       return true;
   }
