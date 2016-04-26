@@ -15,10 +15,11 @@ let FILE_CACHE = {};
 
 function readFile(fileName) {
 
+
   return new Promise((resolve, reject) => {
 
     if (FILE_CACHE[fileName]) {
-      return resolve(FILE_CACHE[fileName]);
+      return resolve({ [fileName]: FILE_CACHE[fileName]});
     }
 
     chrome.runtime.getPackageDirectoryEntry(function(root) {
@@ -48,6 +49,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   switch (request.type) {
     case 'code':
       Promise.all([readFile('inline.js'), readFile('inline.css')]).then((promiseValues) => {
+        console.log('GOT FILES', promiseValues);
+
         let response = Object.assign({}, ...promiseValues);
         sendResponse(response);
       }, errorHandler);

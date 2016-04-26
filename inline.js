@@ -1,5 +1,19 @@
 'use strict';
 
+let EXTENSION_NAME = 'JiraBus';
+
+function log () {
+  return console.log(...[EXTENSION_NAME].concat(Array.from(arguments)));
+}
+
+function group () {
+  return console.group(...[EXTENSION_NAME].concat(Array.from(arguments)));
+}
+
+function groupEnd () {
+  return console.groupEnd();
+}
+
 
 var eventHandlers = jQuery._data(document, 'events');
 console.log(eventHandlers);
@@ -77,27 +91,42 @@ KeyboardDispatcher.prototype._parseHotkeys = function () {
     }, this);
   }, this);
 
-  var observer = new MutationObserver(function () {
+  var observer = new MutationObserver(function (records) {
+    log('MO HANDLER', 'started', Array.from(arguments));
+
+    if (records.every(r => r.addedNodes.length === 0)) {
+      log('NO added nodes. Terminating!');
+      return;
+    }
+
+    observer.disconnect();
+
     this._labelActions();
+
+    observer.observe(document.body, { subtree: true, childList: true });
   }.bind(this));
 
-  observer.observe(document.body, {childList: true});
-
-  //observer.disconnect();
-
   this._labelActions();
+
+  observer.observe(document.body, { subtree: true, childList: true });
 };
 
 KeyboardDispatcher.prototype._labelActions = function () {
+  group('LABEL ACTIONS');
+
   this._decl.forEach((decl) => {
     let target = document.querySelector(decl.targetSelector);
+    log(decl.targetSelector);
     if (!target || target.getAttribute('data-jirabus')) {
+      log('NO NODE or ALREADY PROCESSED');
       return;
     }
 
     let $hotkeyElement = jQuery('<b>')
       .addClass('jirabus-hotkey')
       .text(decl.keysString);
+
+    log('PROCESS', target);
 
     // TODO: надо сделать интеллектуальный поиск ноды с текстом
     let $target = jQuery(target).attr('data-jirabus', 'true');
@@ -110,6 +139,8 @@ KeyboardDispatcher.prototype._labelActions = function () {
     $textNode.append($hotkeyElement);
 
   });
+
+  groupEnd();
 };
 
 KeyboardDispatcher.prototype._blockExistedHandlers = function () {
