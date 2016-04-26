@@ -14,12 +14,16 @@ function groupEnd () {
   return console.groupEnd();
 }
 
-
-var eventHandlers = jQuery._data(document, 'events');
-console.log(eventHandlers);
+function error () {
+  return console.error(...[EXTENSION_NAME].concat(Array.from(arguments)));
+}
 
 var KEYS = {
-  's, w': [
+  's, 1': 'click #opsbar-opsbar-transitions .issueaction-workflow-transition:eq(0)',
+  's, 2': 'click #opsbar-opsbar-transitions .issueaction-workflow-transition:eq(1)',
+  's, 3': 'click #opsbar-opsbar-transitions .issueaction-workflow-transition:eq(2)',
+  's, 4': 'click #opsbar-opsbar-transitions .issueaction-workflow-transition:eq(3)',
+  /*'s, w': [
     'click #action_id_11',
     'click #action_id_241',
     'click #action_id_71'
@@ -50,7 +54,7 @@ var KEYS = {
     'click #action_id_131'
   ], // Есть баги (Bugs)
   's, s': 'click #action_id_101', // Протестировано (TeSted)
-  's, d': 'click #action_id_121', // Deployed on Production (Deployed)
+  's, d': 'click #action_id_121', // Deployed on Production (Deployed) */
   'n': 'click #commit-message-copy' // Copy commit message
 };
 
@@ -72,11 +76,12 @@ KeyboardDispatcher.prototype._parseHotkeys = function () {
     let actions = KEYS[key];
     actions = Array.isArray(actions) ? actions : [actions];
     actions.forEach(action => {
+      let actionSplit = action.split(' ');
       let hotKeyDeclaration = {
         keysString: key,
         keys: key.split(',').map(k => k.trim().toUpperCase()),
-        action: action,
-        targetSelector: action.split(' ')[1]
+        action: actionSplit[0],
+        targetSelector: actionSplit.slice(1).join(' ')
       };
 
       this._decl.push(hotKeyDeclaration);
@@ -115,7 +120,7 @@ KeyboardDispatcher.prototype._labelActions = function () {
   group('LABEL ACTIONS');
 
   this._decl.forEach((decl) => {
-    let target = document.querySelector(decl.targetSelector);
+    let target = jQuery(decl.targetSelector)[0];
     log(decl.targetSelector);
     if (!target || target.getAttribute('data-jirabus')) {
       log('NO NODE or ALREADY PROCESSED');
@@ -144,35 +149,23 @@ KeyboardDispatcher.prototype._labelActions = function () {
 };
 
 KeyboardDispatcher.prototype._blockExistedHandlers = function () {
-  /*['keyup', 'keypress', 'keydown'].forEach(function (eventName) {
-   this._eventHandlersCache[eventName] = [];
-   (eventHandlers[eventName] || []).forEach(function (eventHandlerObj) {
-   this._eventHandlersCache[eventName].push(eventHandlerObj.handler);
-   }, this);
-
-   delete eventHandlers[eventName];
-   }, this);*/
-
   ['keyup', 'keypress', 'keydown'].forEach(eventName =>
     document.addEventListener(eventName, this.processEvent.bind(this), true));
 };
 
-KeyboardDispatcher.prototype.doAction = function (action) {
-  let split = action.split(' ');
-  if (split.length < 2) {
-    return;
-  }
-
-  let elem = document.querySelector(split[1]);
+KeyboardDispatcher.prototype.doAction = function (item) {
+  let elem = jQuery(item.targetSelector)[0];
   if (!elem) {
+    error(`No elem with '${item.targetSelector}' found. Can't do action '${item.action}'!`);
     return;
   }
 
-  if (typeof elem[split[0]] !== 'function') {
+  if (typeof elem[item.action] !== 'function') {
+    error(`Elem '${item.targetSelector}' doesn't contain action '${item.action}'!`);
     return;
   }
 
-  elem[split[0]]();
+  elem[item.action]();
 };
 
 KeyboardDispatcher.prototype.printKeyboardEvent = function (evt) {
@@ -182,7 +175,7 @@ KeyboardDispatcher.prototype.printKeyboardEvent = function (evt) {
 
   cutEvent['key'] = String.fromCharCode(evt.which);
 
-  console.log(cutEvent, evt);
+  log(cutEvent);
 };
 
 
@@ -196,7 +189,8 @@ KeyboardDispatcher.prototype._cancelEvent = function (evt) {
   evt.stopPropagation();
 
   this._canceledEvents.push(evt);
-  console.log('Event was canceled', evt);
+
+  log('Event was canceled', evt);
 };
 
 KeyboardDispatcher.prototype.processEvent = function (evt) {
@@ -213,8 +207,10 @@ KeyboardDispatcher.prototype.processEvent = function (evt) {
   // ищем хоткей, подходящий по клавишам и `target` которого присутствует на странице
   let matchedItems =
     this._queue.filter(
-      (item) => item.keys[0] === key && document.querySelector(item.targetSelector)
+      (item) => item.keys[0] === key && jQuery(item.targetSelector).length
     );
+
+  log('MATCHED ITEMS', matchedItems);
 
   if (['keydown', 'keypress', 'keyup'].includes(evt.type) && matchedItems.length) {
     this._cancelEvent(evt);
@@ -233,7 +229,7 @@ KeyboardDispatcher.prototype.processEvent = function (evt) {
             this.renewShortcut(item);
 
             // здесь нужно эмитить событие, но пока сделаем так
-            this.doAction(item.action);
+            this.doAction(item);
           }
         } else {
           this.renewShortcut(item);
