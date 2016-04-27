@@ -20,7 +20,7 @@
     }
   ],
   "page_action": {
-    "default_icon": "jira.png",
+    "default_icon": "img/jira.png",
     "default_title": "JIRAbus",
     "default_popup": "popup.html"
   },
