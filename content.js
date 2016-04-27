@@ -14,7 +14,7 @@ function inlineCode(ext, code, force) {
   document.body.appendChild(codeNode);
 }
 
-chrome.runtime.sendMessage({ type: 'get-code' }, (response) => {
+chrome.runtime.sendMessage({ command: 'get-code' }, (response) => {
   console.log('JIRAbus content script', response);
 
   let config = response.config;

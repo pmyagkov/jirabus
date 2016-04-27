@@ -25,6 +25,8 @@
     "default_popup": "popup.html"
   },
   "permissions" : [
-    "tabs", "https://jira.mail.ru/*"
+    "tabs",
+    "storage",
+    "https://jira.mail.ru/*"
   ]
 }

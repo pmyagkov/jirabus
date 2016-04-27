@@ -104,24 +104,65 @@ const REST_CONFIG = {
   'delay': 500
 };
 
+const CONFIG_STORAGE_KEY = 'config';
 
 class BackgroundPage {
 
-  constructor () {
-    this.registerListeners();
+  checkConfigInStorage () {
+    console.group('Background.checkConfigInStorage');
 
-    this.FILE_CACHE = {};
-    this.ALLOWED_DOMAINS = ['jira.mail.ru'];
-
-    console.log('Background page constructed');
+    return new Promise((resolve, reject) => {
+      chrome.storage.sync.get(CONFIG_STORAGE_KEY, (value) => {
+        console.log('Storage value', value);
+        if (!Object.keys(value).length) {
+          console.log('Config NOT found in storage. Set default config there.');
+          chrome.storage.sync.set({ [CONFIG_STORAGE_KEY] : this.getDefaultConfigObj() }, () => {
+            if (chrome.runtime.lastError) {
+              console.log('Error during setting config in storage', chrome.runtime.lastError);
+              reject();
+            } else {
+              console.log('Config was saved in storage.');
+              resolve();
+            }
+          });
+        } else {
+          console.log('Config found in storage. OK');
+          resolve();
+        }
+      })
+    }).then(() => console.groupEnd());
   }
 
-  getDefaultConfig () {
-    return {
-      config: Object.assign({}, {
-        hotkeys: Object.assign({}, RELATIVE_HOTKEYS_CONFIG, COMMON_HOTKEYS_CONFIG)
-      }, REST_CONFIG)
-    };
+  getDefaultConfigObj () {
+    return Object.assign({}, {
+      hotkeys: Object.assign({}, RELATIVE_HOTKEYS_CONFIG, COMMON_HOTKEYS_CONFIG)
+    }, REST_CONFIG);
+  }
+
+  getConfig () {
+    return new Promise((resolve, reject) => {
+      chrome.storage.sync.get(CONFIG_STORAGE_KEY, (value) => {
+        if (!value) {
+          console.error(`No config in storage!`);
+          reject();
+          return;
+        }
+
+        resolve({ [CONFIG_STORAGE_KEY] : value});
+      });
+    });
+  }
+
+  constructor () {
+
+    this.checkConfigInStorage().then(() => {
+      this.registerListeners();
+
+      this.FILE_CACHE = {};
+      this.ALLOWED_DOMAINS = ['jira.mail.ru'];
+
+      console.log('Background page constructed');
+    });
   }
 
   getImagePath (imageName) {
@@ -205,22 +246,34 @@ class BackgroundPage {
     console.log('request', request);
     console.log('sender', sender);
 
-    switch (request.type) {
-      case 'get-code':
-        Promise.all([this.readFile('inline.js'), this.readFile('inline.css')])
-          .then((promiseValues) => {
-            console.log('Files read', promiseValues);
+    console.log(`${request.command} command came`);
 
-            let response = Object.assign({}, ...promiseValues.concat(this.getDefaultConfig()));
+    switch (request.command) {
+      case 'get-code':
+        Promise.all([this.readFile('inline/inline.js'), this.readFile('inline/inline.css'), this.getConfig()])
+          .then((promiseValues) => {
+            console.log('Code and config got', promiseValues);
+
+            let response = Object.assign({}, ...promiseValues);
 
             console.log('Sending response', response);
 
             sendResponse(response);
-
-            console.groupEnd();
-          }, this.errorHandler, this);
+          }, this.errorHandler, this)
+          .then(() => console.groupEnd());
 
         this.connectTab(sender);
+
+        return true;
+
+      case 'get-configuration':
+        this.getConfig()
+          .then((response) => {
+            console.log('Sending response', response);
+
+            sendResponse(response);
+          }, this.errorHandler, this)
+          .then(() => console.groupEnd());
 
         return true;
     }
