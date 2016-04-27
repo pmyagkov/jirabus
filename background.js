@@ -148,7 +148,7 @@ class BackgroundPage {
           return;
         }
 
-        resolve({ [CONFIG_STORAGE_KEY] : value});
+        resolve(value);
       });
     });
   }
@@ -254,7 +254,10 @@ class BackgroundPage {
           .then((promiseValues) => {
             console.log('Code and config got', promiseValues);
 
-            let response = Object.assign({}, ...promiseValues);
+            let response = {
+              command: request.command,
+              data: Object.assign({}, ...promiseValues)
+            };
 
             console.log('Sending response', response);
 
@@ -266,9 +269,14 @@ class BackgroundPage {
 
         return true;
 
-      case 'get-configuration':
+      case 'get-config':
         this.getConfig()
-          .then((response) => {
+          .then((data) => {
+            let response = {
+              command: request.command,
+              data: data
+            };
+
             console.log('Sending response', response);
 
             sendResponse(response);

@@ -14,14 +14,23 @@ function inlineCode(ext, code, force) {
   document.body.appendChild(codeNode);
 }
 
-chrome.runtime.sendMessage({ command: 'get-code' }, (response) => {
-  console.log('JIRAbus content script', response);
+let GET_CODE_COMMAND = 'get-code';
 
-  let config = response.config;
-  delete response.config;
+chrome.runtime.sendMessage({ command: GET_CODE_COMMAND }, (response) => {
+  let { data, command } = response;
 
-  Object.keys(response).forEach((fileName) => {
-    let code = response[fileName];
+  if (command !== GET_CODE_COMMAND) {
+    return;
+  }
+
+  console.group('JIRAbus.sendMessage.callback');
+  console.log('Got response', response);
+
+  let config = data.config;
+  delete data.config;
+
+  Object.keys(data).forEach((fileName) => {
+    let code = data[fileName];
     let ext = fileName.split('.');
     ext = ext[ext.length - 1];
 
@@ -35,4 +44,6 @@ chrome.runtime.sendMessage({ command: 'get-code' }, (response) => {
 
     inlineCode(ext, code);
   });
+
+  console.groupEnd();
 });

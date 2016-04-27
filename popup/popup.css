@@ -1,0 +1,18 @@
+body {
+  width: 500px;
+  min-height: 300px;
+}
+
+.hotkey {
+  width: 50px;
+  margin-right: 20px;
+}
+
+.selector {
+  width: 150px;
+  margin-right: 20px;
+}
+
+.disable, .remove {
+  margin-right: 20px;
+}

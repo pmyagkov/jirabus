@@ -22,11 +22,12 @@
   "page_action": {
     "default_icon": "img/jira.png",
     "default_title": "JIRAbus",
-    "default_popup": "popup.html"
+    "default_popup": "popup/popup.html"
   },
   "permissions" : [
     "tabs",
     "storage",
-    "https://jira.mail.ru/*"
+    "https://jira.mail.ru/*",
+    "https://code.jquery.com/*"
   ]
 }

@@ -1,3 +1,53 @@
 .jirabus-hotkey {
   margin-left: 5px;
 }
+.jirabus-border {
+  box-shadow: 0px 2px 2px 2px #86baed, 2px 0px 2px 2px #86baed, 0px -2px 2px 2px #86baed, -2px 0px 2px 2px #86baed;
+}
+.capture-panel {
+  width: 170px;
+  height: 26px;
+  background: #808080;
+  border: 1px solid #000;
+  border-bottom-left-radius: 11px;
+  position: absolute;
+  right: 0;
+  top: -3px;
+}
+.capture-panel .capture-label {
+  display: inline-block;
+  padding: 4px 10px;
+  cursor: pointer;
+}
+.capture-panel .capture-indicator {
+  width: 16px;
+  height: 16px;
+  background: #2d3044;
+  border: #6495ed 1px solid;
+  display: inline-block;
+  border-radius: 50%;
+  vertical-align: middle;
+  margin-top: -1px;
+}
+.capture-panel .capture-text {
+  display: inline-block;
+  vertical-align: middle;
+  margin-top: 1px;
+}
+.capture-panel .capture-text_on {
+  display: none;
+}
+.capture-panel .capture-toggler {
+  position: absolute;
+  opacity: 0;
+  clip: rect(0, 0, 0, 0);
+}
+.capture-panel .capture-toggler:checked ~ .capture-indicator {
+  background: #86baed;
+}
+.capture-panel .capture-toggler:checked ~ .capture-text_on {
+  display: inline-block;
+}
+.capture-panel .capture-toggler:checked ~ .capture-text_off {
+  display: none;
+}

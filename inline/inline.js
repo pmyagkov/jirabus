@@ -1,5 +1,7 @@
 'use strict';
 
+let $ = jQuery;
+
 let EXTENSION_NAME = 'JIRABus';
 
 function log () {
@@ -18,6 +20,62 @@ function error () {
   return console.error(...[EXTENSION_NAME].concat(Array.from(arguments)));
 }
 
+class Capturer {
+  constructor () {
+    this._capturing = false;
+
+    this._$panel = $(`<div class="capture-panel">
+      <label for="capture-toggler" class="capture-label">
+        <input type="checkbox" id="capture-toggler" class="capture-toggler">
+        <span class="capture-indicator"></span>
+        <span class="capture-text capture-text_on">Capturing!</span>
+        <span class="capture-text capture-text_off">Click to start capture</span>
+      </label>
+    </div>`);
+
+    $(document.body).append(this._$panel);
+
+    this._bindEvents();
+  }
+
+  _bindEvents () {
+    this._$panel.on('change', 'input[type="checkbox"]', (evt) => {
+      this._capturing = evt.target.checked;
+
+      console.log('Capturer._onChange', 'Capturing is turned ', this._capturing ? 'on' : 'off');
+
+      this[this._capturing ? '_startCapture' : '_stopCapture']();
+    })
+  }
+
+  handleEvent (evt) {
+    switch (evt.type) {
+      case 'mouseover':
+        return this._onCaptureMouseOver(evt.target);
+      case 'mouseout':
+        return this._onCaptureMouseLeave(evt.target);
+    }
+
+  }
+
+  _onCaptureMouseOver (target) {
+    target.classList && target.classList.add('jirabus-border');
+  }
+
+  _onCaptureMouseLeave (target) {
+    target.classList && target.classList.remove('jirabus-border');
+  }
+
+  _startCapture() {
+    document.addEventListener('mouseover', this, true);
+    document.addEventListener('mouseout', this, true);
+  }
+
+  _stopCapture() {
+    document.removeEventListener('mouseover', this, true);
+    document.removeEventListener('mouseout', this, true);
+  }
+}
 
 class KeyboardDispatcher {
   constructor (config) {
@@ -208,10 +266,12 @@ class KeyboardDispatcher {
  * @param config
  */
 let keyboardDispatcher;
+let capturer;
 function main(config) {
   if (keyboardDispatcher) {
     // TODO: clean dispatcher and reconfig it
   }
 
   keyboardDispatcher = new KeyboardDispatcher(config);
+  capturer = new Capturer;
 }
