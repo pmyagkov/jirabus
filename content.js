@@ -15,6 +15,21 @@ function inlineCode(ext, code, force) {
 }
 
 let GET_CODE_COMMAND = 'get-code';
+let SET_CONFIG_COMMAND = 'set-config';
+
+document.addEventListener(SET_CONFIG_COMMAND, (evt) => {
+  let config = evt.detail;
+
+  let request = {
+    command: SET_CONFIG_COMMAND,
+    data: config
+  };
+
+  chrome.runtime.sendMessage(request, (response) => {
+    var event = new CustomEvent('set-config-success', { });
+    document.dispatchEvent(event);
+  });
+});
 
 chrome.runtime.sendMessage({ command: GET_CODE_COMMAND }, (response) => {
   let { data, command } = response;

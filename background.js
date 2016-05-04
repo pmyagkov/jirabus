@@ -1,26 +1,34 @@
-const RELATIVE_HOTKEYS_CONFIG = {
-  's, 1': {
-    actions: ['click #opsbar-opsbar-transitions .issueaction-workflow-transition:eq(0)'],
+const RELATIVE_HOTKEYS_CONFIG = [
+  {
+    hotkey: 's, 1',
+    selector: '#opsbar-opsbar-transitions .issueaction-workflow-transition:eq(0)',
+    action: 'click',
     description: 'Первый статус тикета'
   },
 
-  's, 2': {
-    actions: ['click #opsbar-opsbar-transitions .issueaction-workflow-transition:eq(1)'],
+  {
+    hotkey: 's, 2',
+    selector: '#opsbar-opsbar-transitions .issueaction-workflow-transition:eq(1)',
+    action: 'click',
     description: 'Второй статус тикета'
   },
 
-  's, 3': {
-    actions: ['click #opsbar-opsbar-transitions .issueaction-workflow-transition:eq(2)'],
+  {
+    hotkey: 's, 3',
+    selector: '#opsbar-opsbar-transitions .issueaction-workflow-transition:eq(2)',
+    action: 'click',
     description: 'Третий статус тикета'
   },
 
-  's, 4': {
-    actions: ['click #opsbar-opsbar-transitions .issueaction-workflow-transition:eq(3)'],
+  {
+    hotkey: 's, 4',
+    selector: '#opsbar-opsbar-transitions .issueaction-workflow-transition:eq(3)',
+    action: 'click',
     description: 'Четвертый статус тикета'
   }
-};
+];
 
-const ABSOLUTE_HOTKEYS_CONFIG = {
+/*const ABSOLUTE_HOTKEYS_CONFIG = {
   's, w': {
     actions: [
       'click #action_id_11',
@@ -91,14 +99,16 @@ const ABSOLUTE_HOTKEYS_CONFIG = {
     description: 'Deployed on Production (Deployed)'
   }
 
-};
+};*/
 
-const COMMON_HOTKEYS_CONFIG = {
-  'n': {
-    actions: ['click #commit-message-copy'],
+const COMMON_HOTKEYS_CONFIG = [
+  {
+    hotkey: 'n',
+    selector: '#commit-message-copy',
+    action: 'click',
     description: 'Копирование commit-сообщения'
   }
-};
+];
 
 const REST_CONFIG = {
   'delay': 500
@@ -135,7 +145,7 @@ class BackgroundPage {
 
   getDefaultConfigObj () {
     return Object.assign({}, {
-      hotkeys: Object.assign({}, RELATIVE_HOTKEYS_CONFIG, COMMON_HOTKEYS_CONFIG)
+      hotkeys: [].concat(RELATIVE_HOTKEYS_CONFIG, COMMON_HOTKEYS_CONFIG)
     }, REST_CONFIG);
   }
 
@@ -149,6 +159,20 @@ class BackgroundPage {
         }
 
         resolve(value);
+      });
+    });
+  }
+
+  setConfig (config) {
+    return new Promise((resolve, reject) => {
+      chrome.storage.sync.set({ [CONFIG_STORAGE_KEY] : config }, () => {
+        if (!chrome.runtime.lastError) {
+          console.log('Config set successfully');
+          resolve();
+        } else {
+          console.error(`Storage save error! ${chrome.runtime.lastError}`);
+          reject();
+        }
       });
     });
   }
@@ -284,6 +308,18 @@ class BackgroundPage {
           .then(() => console.groupEnd());
 
         return true;
+
+      case 'set-config':
+        this.setConfig(request.data)
+          .then(() => {
+            let response = {
+              command: request.command
+            };
+
+            console.log('Sending response', response);
+
+            sendResponse(response);
+          })
     }
   }
 

@@ -21,8 +21,7 @@
   ],
   "page_action": {
     "default_icon": "img/jira.png",
-    "default_title": "JIRAbus",
-    "default_popup": "popup/popup.html"
+    "default_title": "JIRAbus"
   },
   "permissions" : [
     "tabs",
