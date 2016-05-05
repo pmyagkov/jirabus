@@ -12,6 +12,8 @@ function inlineCode(ext, code, force) {
   codeNode.textContent = code;
 
   document.body.appendChild(codeNode);
+
+  return codeNode;
 }
 
 let GET_CODE_COMMAND = 'get-code';
@@ -49,15 +51,10 @@ chrome.runtime.sendMessage({ command: GET_CODE_COMMAND }, (response) => {
     let ext = fileName.split('.');
     ext = ext[ext.length - 1];
 
+    let codeNode = inlineCode(ext, code);
     if (ext === 'js') {
-      if (config) {
-        code += ';main(' + JSON.stringify(config) + ');';
-      } else {
-        code += ';alert("NO CONFIG PASSED");';
-      }
+      document.dispatchEvent(new CustomEvent('config', { 'detail':  config }));
     }
-
-    inlineCode(ext, code);
   });
 
   console.groupEnd();

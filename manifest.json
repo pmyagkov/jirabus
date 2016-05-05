@@ -6,7 +6,7 @@
   "description": "Keyboard enhancer for Atlassian JIRA",
   "background": {
     "scripts": [
-      "background.js"
+      "js/background.js"
     ]
   },
   "content_scripts": [
@@ -15,7 +15,7 @@
         "https://jira.mail.ru/*"
       ],
       "js": [
-        "content.js"
+        "js/content.js"
       ]
     }
   ],

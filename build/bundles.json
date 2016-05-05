@@ -1,0 +1,40 @@
+{
+  "bundles": [
+    {
+      "name": "background",
+      "content": [
+        {
+          "type": "js",
+          "entry": "./background/index.js"
+        }
+      ]
+    },
+    {
+      "name": "content",
+      "content": [
+        {
+          "type": "js",
+          "entry": "./content/index.js"
+        }
+      ]
+    },
+    {
+      "name": "inline",
+      "content": [
+        {
+          "type": "js",
+          "entry": "./inline/index.js"
+        },
+        {
+          "type": "css",
+          "entry": "./inline/main.styl"
+        }
+      ]
+    }
+  ],
+  
+  "output_dir": {
+    "js": "static/js",
+    "css": "static/css"
+  }
+}
