@@ -1,5 +1,3 @@
-const CONSTS = {
-  GET_
-};
-
-export default CONSTS;
+export default {
+  EXTENSION_NAME: 'JIRABus'
+}
