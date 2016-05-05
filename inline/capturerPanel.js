@@ -1,3 +1,5 @@
+import KeyboardDispatcher from './keyboardDispatcher'
+
 let $ = jQuery;
 
 class CapturerPanel {
@@ -93,11 +95,11 @@ class CapturerPanel {
     let focusValue = evt.type === 'focusin';
 
     if (focusValue) {
-      MinimalKeyboardDispatcher.connect(evt.target);
+      KeyboardDispatcher.connect(evt.target);
       $(evt.target).val('');
     } else {
 
-      let hotkey = MinimalKeyboardDispatcher.disconnect(evt.target);
+      let hotkey = KeyboardDispatcher.disconnect(evt.target);
       let id = $(evt.target).closest('.hotkeys-item').data('id');
 
       this._setHotkey(hotkey, id);
