@@ -27,7 +27,7 @@
         },
         {
           "type": "css",
-          "entry": "./inline/index.styl"
+          "entry": "./inline/main.styl"
         }
       ]
     }

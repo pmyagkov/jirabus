@@ -165,20 +165,20 @@ gulp.task('report', function () {
 
 gulp.task('watch:css', function() {
   gulp.watch([
-    'app/**/*.css',
-    'app/**/*.less',
-    'container/**/*.css',
-    'container/**/*.less',
-    'module/**/*.css',
-    'module/**/*.less',
-    'page/**/*.css',
-    'page/**/*.less',
-    'templates/**/*.css',
-    'templates/**/*.less',
-    'widget/**/*.css',
-    'widget/**/*.less'
+    '**/*.styl'
   ], ['build:css']);
 });
+
+gulp.task('watch:js', function() {
+  gulp.watch([
+    'background/*.js',
+    'content/*.js',
+    'inline/*.js',
+    'common/*.js'
+  ], ['build:css']);
+});
+
+gulp.task('watch', ['watch:js', 'watch:css']);
 
 // Сборка ассетов
 gulp.task('build', ['build:js', 'build:css']);
