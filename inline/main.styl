@@ -42,6 +42,10 @@ $bcolor = rgba(0,0,0,.2)
   &_opened
     right: -2px
 
+
+  &.opaque
+    opacity: .5
+
   .open-toggler
     position: absolute;
     left: -29px
@@ -132,11 +136,6 @@ $bcolor = rgba(0,0,0,.2)
 
   &-item
     margin-bottom: $mb
-
-    &.loading::after
-      content: 'loading'
-      position: absolute
-      padding: 4px 0 0 10px
 
     &__commands
       padding: 3px 0 0 7px

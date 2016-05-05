@@ -180,20 +180,42 @@ class CapturerPanel {
   _onSelectorHover (evt) {
     let hoverValue = evt.type === 'mouseenter';
     let selector = evt.target.value;
-    $(selector).toggleClass('jirabus-border', hoverValue);
+
+    let $selected = $(selector);
+    if (!$selected.length) {
+      return;
+    }
+
+    $selected.toggleClass('jirabus-border', hoverValue);
+
+    let selectedOffset = $selected.offset();
+    let panelOffset = this._$panel.offset();
+
+    const toggleOpacityValue = panelOffset.left < selectedOffset.left
+      && selectedOffset.left < panelOffset.left + this._$panel.width()
+      && panelOffset.top < selectedOffset.top
+      && selectedOffset.top < panelOffset.top + this._$panel.height();
+
+    this._$panel.toggleClass('opaque', toggleOpacityValue);
   }
 
   _onCaptureChange (evt) {
-    this._capturing = evt.target.checked;
-
-    console.log('CapturerPanel._onChange', 'Capturing is turned ', this._capturing ? 'on' : 'off');
-
-    this[this._capturing ? '_startCapture' : '_stopCapture']();
+    this[evt.target.checked ? '_startCapture' : '_stopCapture']();
   }
 
-  _onArrowClick (evt) {
-    let baseClass = this._$panel[0].classList.item(0);
-    this._$panel.toggleClass(baseClass + '_opened');
+  /**
+   *
+   * @param {Boolean?} value
+   * @private
+   */
+  _toggleOpenness (value) {
+    let baseClass = this._$panel[0].classList[0];
+
+    this._$panel.toggleClass(baseClass + '_opened', value);
+  }
+
+  _onArrowClick () {
+    this._toggleOpenness();
   }
 
   _isValidElement (target) {
@@ -245,7 +267,10 @@ class CapturerPanel {
     let hotkeyObj = this._createBlankHotkeyObj(hotkey, selector);
 
     let $hotkeyItem = this._appendHotkeyRow(hotkeyObj, true);
-    $hotkeyItem.find('.hotkey').focus();
+
+    this._stopCapture();
+    // TODO: this time is hardcoded (see animation length in inline.styl)
+    setTimeout(() => $hotkeyItem.find('.hotkey').focus(), 550);
   }
 
   /**
@@ -317,15 +342,27 @@ class CapturerPanel {
   }
 
   _startCapture() {
+    this._capturing = true;
+    this._$panel.find('.indicator-checkbox').attr('checked', this._capturing);
+
+    console.log('CapturerPanel._onChange', 'Capturing is turned ', this._capturing ? 'on' : 'off');
+
     document.addEventListener('mouseover', this, true);
     document.addEventListener('mouseout', this, true);
     document.addEventListener('click', this, true);
+
+    this._toggleOpenness(!this._capturing);
   }
 
   _stopCapture() {
+    this._capturing = false;
+    this._$panel.find('.indicator-checkbox').attr('checked', this._capturing);
+
     document.removeEventListener('mouseover', this, true);
     document.removeEventListener('mouseout', this, true);
     document.removeEventListener('click', this, true);
+
+    this._toggleOpenness(!this._capturing);
   }
 }
 
