@@ -4,7 +4,7 @@ var path = require('path');
 
 module.exports = {
   context: path.resolve(__dirname, '..'),
-  devtool: '#inline-source-map',
+  devtool: '#cheap-module-source-map',
   resolve: {
     root: path.resolve(__dirname, '..')
   },

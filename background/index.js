@@ -274,7 +274,7 @@ class BackgroundPage {
 
     switch (request.command) {
       case 'get-code':
-        Promise.all([this.readFile('inline/inline.js'), this.readFile('inline/inline.css'), this.getConfig()])
+        Promise.all([this.readFile('js/inline.js'), this.readFile('css/inline.css'), this.getConfig()])
           .then((promiseValues) => {
             console.log('Code and config got', promiseValues);
 

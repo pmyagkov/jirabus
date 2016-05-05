@@ -175,13 +175,25 @@ gulp.task('watch:js', function() {
     'content/*.js',
     'inline/*.js',
     'common/*.js'
-  ], ['build:css']);
+  ], ['build:js']);
 });
+
+gulp.task('copy-assets', function () {
+  return gulp.src(['img/*'])
+    .pipe(gulp.dest('static/img'));
+});
+
+gulp.task('copy-manifest', function () {
+  return gulp.src(['manifest.json', 'img'])
+    .pipe(gulp.dest('static'));
+});
+
+gulp.task('copy', ['copy-manifest', 'copy-assets']);
 
 gulp.task('watch', ['watch:js', 'watch:css']);
 
 // Сборка ассетов
-gulp.task('build', ['build:js', 'build:css']);
+gulp.task('build', ['build:js', 'build:css', 'copy']);
 
 // Минификация ассетов
 gulp.task('minify', ['minify:css', 'minify:js']);
