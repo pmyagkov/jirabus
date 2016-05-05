@@ -1,0 +1,24 @@
+{
+  "name": "jirabus",
+  "version": "0.0.1",
+  "description": "A bus with enhanced JIRA hotkeys",
+  "main": "background.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pmyagkov/jirabus.git"
+  },
+  "keywords": [
+    "hotkey",
+    "jira",
+    "productivity"
+  ],
+  "author": "Pavel Myagkov",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/pmyagkov/jirabus/issues"
+  },
+  "homepage": "https://github.com/pmyagkov/jirabus#readme"
+}
