@@ -20,5 +20,9 @@
   "bugs": {
     "url": "https://github.com/pmyagkov/jirabus/issues"
   },
-  "homepage": "https://github.com/pmyagkov/jirabus#readme"
+  "homepage": "https://github.com/pmyagkov/jirabus#readme",
+  "devDependencies": {
+    "webpack": "^1.13.0",
+    "webpack-dev-server": "^1.14.1"
+  }
 }
