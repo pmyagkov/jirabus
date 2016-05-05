@@ -14,14 +14,51 @@ function inlineCode(ext, code, force) {
   document.body.appendChild(codeNode);
 }
 
-chrome.runtime.sendMessage({ type: 'code' }, (response) => {
-  console.log('content', response);
+let GET_CODE_COMMAND = 'get-code';
+let SET_CONFIG_COMMAND = 'set-config';
 
-  Object.keys(response).forEach((fileName) => {
-    let code = response[fileName];
+document.addEventListener(SET_CONFIG_COMMAND, (evt) => {
+  let config = evt.detail;
+
+  let request = {
+    command: SET_CONFIG_COMMAND,
+    data: config
+  };
+
+  chrome.runtime.sendMessage(request, (response) => {
+    var event = new CustomEvent('set-config-success', { });
+    document.dispatchEvent(event);
+  });
+});
+
+chrome.runtime.sendMessage({ command: GET_CODE_COMMAND }, (response) => {
+  let { data, command } = response;
+
+  if (command !== GET_CODE_COMMAND) {
+    return;
+  }
+
+  console.group('JIRAbus.sendMessage.callback');
+  console.log('Got response', response);
+
+  let config = data.config;
+  delete data.config;
+
+  Object.keys(data).forEach((fileName) => {
+    let code = data[fileName];
     let ext = fileName.split('.');
     ext = ext[ext.length - 1];
 
+    if (ext === 'js') {
+      if (config) {
+        code += ';main(' + JSON.stringify(config) + ');';
+      } else {
+        code += ';alert("NO CONFIG PASSED");';
+      }
+    }
+
     inlineCode(ext, code);
   });
+
+  console.groupEnd();
 });

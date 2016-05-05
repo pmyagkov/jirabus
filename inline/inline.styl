@@ -1,0 +1,151 @@
+// highlight color
+$hcolor = red
+// shadow width
+$swidth = 2px
+// indicator width
+$iwidth = 16px
+
+$pwidth = 500px
+
+// panel background
+$pbg = #F5F5F5
+$bcolor = rgba(0,0,0,.2)
+
+.jirabus-hotkey
+  margin-left: 5px
+
+.jirabus-border
+  box-shadow:
+          0 $swidth $swidth - 1 $swidth - 1 $hcolor,
+          $swidth 0 $swidth - 1 $swidth - 1 $hcolor,
+          0 - $swidth $swidth - 1 $swidth - 1 $hcolor,
+          - $swidth 0 $swidth - 1 $swidth - 1 $hcolor
+
+.capture-panel
+  width: $pwidth
+  box-sizing: border-box
+  height: auto
+  background: $pbg
+  border: 1px solid $bcolor
+
+  padding: 0 20px
+
+  z-index: 100
+
+
+  position: absolute;
+  right: - $pwidth - 2;
+  transition: right .5s
+  top: 50px;
+
+  &_opened
+    right: -2px
+
+  .open-toggler
+    position: absolute;
+    left: -29px
+    top: -1px
+    display: inline-block
+    width: 30px
+    height: 28px
+    color: red
+
+    background: $pbg
+
+    border: 1px solid $bcolor
+    border-bottom-left-radius: 7px
+    border-top-left-radius: 7px
+    border-right-width: 0
+
+    &::before
+      content: '←'
+      display: inline-block
+      width: 100%
+      height: 100%
+      font-size: 18px
+      padding: 0 5px
+
+    .capture-panel_opened&::before
+      content: '→'
+
+
+  .indicator
+    display: inline-block;
+    padding: 3px 0
+
+    cursor: pointer
+
+    &-icon
+      width: $iwidth
+      height: $iwidth
+      border: $hcolor 2px solid
+
+      display: inline-block;
+      border-radius: 50%;
+      vertical-align: middle;
+
+      margin-top: -1px
+
+
+    &-text
+      display: inline-block
+      vertical-align: middle
+      margin: 1px 0 0 3px
+      font-size: 16px
+
+      &_on
+        display: none
+
+        &::before
+          content: 'Capturing! Click to stop it.'
+
+      &_off::before
+        content: 'Click to start capture!'
+
+
+    &-checkbox
+      position: absolute
+      opacity: 0
+      clip: rect(0,0,0,0)
+
+      &:checked ~ .indicator-icon
+        background: $hcolor
+
+      &:checked ~ .indicator-text_on
+        display: inline-block
+
+      &:checked ~ .indicator-text_off
+        display: none
+
+
+.hotkeys
+  // margin-right
+  $mr = 20px
+  // margin-bottom
+  $mb = 10px
+
+  list-style: none
+  padding: 0
+
+  &-item
+    margin-bottom: $mb
+
+    &.loading::after
+      content: 'loading'
+      position: absolute
+      padding: 4px 0 0 10px
+
+
+  .hotkey
+    width: 100px
+
+  .selector
+    width: 300px
+    margin-right: $mr
+
+  & input[type="text"]
+    line-height: 1.5
+    font-size: 17px
+    padding: 0 5px
+
+

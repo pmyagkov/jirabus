@@ -20,11 +20,13 @@
     }
   ],
   "page_action": {
-    "default_icon": "jira.png",
-    "default_title": "JIRAbus",
-    "default_popup": "popup.html"
+    "default_icon": "img/jira.png",
+    "default_title": "JIRAbus"
   },
   "permissions" : [
-    "tabs", "https://jira.mail.ru/*"
+    "tabs",
+    "storage",
+    "https://jira.mail.ru/*",
+    "https://code.jquery.com/*"
   ]
 }

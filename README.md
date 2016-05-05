@@ -27,6 +27,6 @@ git clone git@github.com:pmyagkov/jirabus.git jirabus
 
 Далее загружаем расширение в Google Chrome и выбираем `PROJECT_PATH`:
 
-![](readme-images/extension.png)
+![](readme/extension.png)
 
 Перезагружаем страницу с JIRA. Если все хорошо, то иконка расширения загорится жёлтым.
