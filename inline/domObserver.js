@@ -45,6 +45,10 @@ class DomObserver {
   _labelTargets (force) {
     console.group('LABEL ACTIONS');
 
+    if (force) {
+      $('.jirabus-hotkey').each((i, e) => $(e).remove());
+    }
+
     this._config.hotkeys.forEach((hotkeyObj) => {
       let target = jQuery(hotkeyObj.selector)[0];
       console.log(hotkeyObj.selector);
@@ -54,7 +58,7 @@ class DomObserver {
         return;
       }
 
-      let $hotkeyElement = jQuery('<b>')
+      let $hotkeyElement = jQuery('<span>')
         .addClass('jirabus-hotkey')
         .text(hotkeyObj.hotkey);
 

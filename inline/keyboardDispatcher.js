@@ -82,7 +82,7 @@ class KeyboardDispatcher {
     evt.preventDefault();
     evt.stopPropagation();
 
-    let symbol = this.resolveKeyFromEvent(evt);
+    let symbol = this.constructor.resolveKeyFromEvent(evt);
 
     this._printKeyboardEvent(evt, { symbol });
 

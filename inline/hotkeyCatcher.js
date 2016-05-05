@@ -106,17 +106,21 @@ const $ = jQuery;
  */
 class HotkeyCatcher {
   constructor (config) {
+    this._onConfigChange = this._onConfigChange.bind(this);
+
+    this._initPropsWithConfig(config);
+    this._buildHotkeyTree();
+
+    this._bindEvents();
+  }
+
+  _initPropsWithConfig (config) {
     Object.assign(this, {
       '_delay': config.delay,
       '_hotkeys': config.hotkeys,
 
       '_canceledEvents': []
-
     });
-
-    this._buildHotkeyTree();
-
-    this._bindEvents();
   }
 
   destroy () {
@@ -126,11 +130,15 @@ class HotkeyCatcher {
   _bindEvents () {
     ['keyup', 'keypress', 'keydown'].forEach(eventName =>
       document.addEventListener(eventName, this, true));
+
+    document.addEventListener('set-config-success', this._onConfigChange);
   }
 
   _unbindEvents () {
     ['keyup', 'keypress', 'keydown'].forEach(eventName =>
       document.removeEventListener(eventName, this, true));
+
+    document.removeEventListener('set-config-success', this._onConfigChange);
   }
 
   _buildHotkeyNode (node, restChars, hotkey) {
@@ -154,6 +162,13 @@ class HotkeyCatcher {
       next[char] = next[char] || {};
       this._buildHotkeyNode(next[char], restChars, hotkey);
     }
+  }
+
+  _onConfigChange (evt) {
+    let config = evt.detail;
+
+    this._initPropsWithConfig(config);
+    this._buildHotkeyTree();
   }
 
   /**
@@ -188,22 +203,7 @@ class HotkeyCatcher {
     console.log('Event was canceled', evt);
   }
 
-  /*doAction (item) {
-    let elem = jQuery(item.selector)[0];
-    if (!elem) {
-      error(`No elem with '${item.selector}' found. Can't do action '${item.action}'!`);
-      return;
-    }
-
-    if (typeof elem[item.action] !== 'function') {
-      error(`Elem '${item.selector}' doesn't contain action '${item.action}'!`);
-      return;
-    }
-
-    elem[item.action]();
-  }*/
-
-  resetNodePointer () {
+  _resetNodePointer () {
     this._currentNode = this._root;
     this.clearKeydownSymbols();
   }
@@ -223,7 +223,7 @@ class HotkeyCatcher {
       // timeout passed, reset the node pointer
       if (this.isEventTimeoutExpired(this._delay)) {
         console.log('Timeout expired!');
-        this.resetNodePointer();
+        this._resetNodePointer();
       } else {
         console.log('Timeout NOT expired!');
       }
@@ -240,7 +240,7 @@ class HotkeyCatcher {
 
       if (!this._currentNode[traverse]) {
         console.log(`No '${traverse}' traverse in node`, this._currentNode);
-        return this.resetNodePointer();
+        return this._resetNodePointer();
       }
 
       let traverseNode = this._currentNode[traverse][symbol];
@@ -254,8 +254,7 @@ class HotkeyCatcher {
         // we went to a leaf
         let hotkey = this._currentNode.hotkey;
         if (hotkey) {
-          console.log('Hotkey found!', hotkey);
-          document.dispatchEvent(new CustomEvent('jirabus-hotkey', { detail: hotkey }))
+          this._triggerHotkeyEvent(hotkey);
         } else {
           this.addKeydownSymbol(symbol);
         }
@@ -275,6 +274,11 @@ class HotkeyCatcher {
       console.groupEnd();
     }
 
+  }
+
+  _triggerHotkeyEvent (hotkey) {
+    console.log('Hotkey found!', hotkey);
+    document.dispatchEvent(new CustomEvent('jirabus-hotkey', { 'detail': hotkey }))
   }
 }
 

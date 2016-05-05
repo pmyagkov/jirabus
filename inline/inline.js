@@ -11,10 +11,6 @@ let capturer;
 let domObserver;
 
 function main(config) {
-  if (hotkeyCatcher) {
-    // TODO: clean dispatcher and reconfig it
-  }
-
   hotkeyCatcher = new HotkeyCatcher(config);
   capturer = new CapturerPanel(config);
   domObserver = new DomObserver(config);

@@ -63,6 +63,10 @@ class CapturerPanel {
     $container
       .append(`<input type="text" class="hotkey" value="${hotkeyObj.hotkey}" placeholder="Type hotkey">`);
 
+    $(`<div class="hotkeys-item__commands"></div>`)
+      .appendTo($container)
+      .append(`<a href="#" title="Remove" class="command command_remove">Remove</a>`);
+
     /*$container
      .append(`<button class="disable">Disable</button>`)
      .append(`<button class="remove">Remove</button>`);*/
@@ -82,13 +86,62 @@ class CapturerPanel {
 
     this._$panel.on('focusin focusout', '.hotkey', this._onHotkeyFocusChange.bind(this));
 
-    $(document).on('set-config-success', this._onConfigSet.bind(this));
+    this._$panel.on('click', '.command_remove', this._onRemoveHotkeyClick.bind(this));
+
+    $(document)
+      .on('set-config-success', this._onConfigSet.bind(this))
+      .on('jirabus-hotkey', this._onHotkey.bind(this));
+
+  }
+
+  _onRemoveHotkeyClick (evt) {
+    const $hotkeyContainer = $(evt.target).closest('[data-id]');
+    const id = $hotkeyContainer.data('id');
+
+    $hotkeyContainer.remove();
+
+    this._removeHotkeyFromConfig(id);
+  }
+
+  _removeHotkeyFromConfig (id) {
+    this._config.hotkeys = this._config.hotkeys.filter((hotkeyObj) => hotkeyObj.id !== id);
+    this._saveConfig();
+  }
+
+  _onHotkey (evt) {
+    const hotkey = evt.originalEvent.detail;
+
+    let hotkeyObj = this._getHotkeyObjByHotkey(hotkey);
+    if (!hotkeyObj) {
+      return;
+    }
+
+    this._doAction(hotkeyObj);
+  }
+
+  _doAction (hotkeyObj) {
+    const { selector, action } = hotkeyObj;
+
+    let elem = $(selector)[0];
+    if (!elem) {
+      console.error(`No elem with '${selector}' found. Can't do action '${action}'!`);
+      return;
+    }
+
+    if (typeof elem[action] !== 'function') {
+      console.error(`Elem '${selector}' doesn't contain action '${action}'!`);
+      return;
+    }
+
+    elem[action]();
+  }
+
+  _getHotkeyObjByHotkey (hotkey) {
+    return this._config.hotkeys.find((hotkeyObj) => hotkeyObj.hotkey === hotkey);
   }
 
   _onConfigSet () {
     this._$panel.find('.loading').each((i, el) => $(el).removeClass('loading'));
-
-
   }
 
   _onHotkeyFocusChange (evt) {
@@ -195,23 +248,51 @@ class CapturerPanel {
     $hotkeyItem.find('.hotkey').focus();
   }
 
-  _calculateSelector (target, relative) {
-    let idClosest = $(target).closest('[id]')[0];
+  /**
+   * Build a selector to find the passed element in DOM.
+   *
+   * Requirements to the selector:
+   * 1. It should query single element.
+   *
+   * Building selector strategy:
+   * – Case 1. Element has an `id` — `#id`
+   * – No closest elements with `id` — first class from the classList (`.ui-element.button` → `.ui-element`)
+   * – Element has closest parent with an `id` — `#id .first_class`
+   *   But in this case we need to check how many elements will be found using this selector.
+   *   If several found add `:eq(n)` to find the exact node.
+   *
+   *
+   * @param {HtmlElement} target
+   * @returns {String|undefined}
+   * @private
+   */
+  _calculateSelector (target) {
+    let $idClosest = $(target).closest('[id]');
     let selector;
-    if (!idClosest) {
-      selector = `.${target.classList.toString().split(' ').join('.')}`;
-    } else {
-      if (idClosest === target) {
-        selector = `#${target.getAttribute('id')}`;
-      }
+
+    if ($idClosest[0] === target) {
+      return `#${$idClosest.attr('id')}`;
     }
 
-    // пытаемся посчитать количество элементов в селекторе
+    let firstClass = target.classList[0];
+    // we can't continue building the selector without at least one class
+    if (!firstClass) {
+      return;
+    }
+
+    // we think the first class is the best one
+    selector = `.${firstClass}`;
+    if ($idClosest.length) {
+      selector = `#${$idClosest.attr('id')} ${selector}`;
+    }
+
+    // trying to count elements queried with this selector
     var queriedSelector = $(selector);
+    // this selector is correct
     if (queriedSelector.length === 1) {
-      // это правильный селектор
       return selector;
     } else {
+      // find index of target among found elements and add `:eq(n)` suffix
       let index = queriedSelector.findIndex((elem) => elem === target);
       if (index > -1) {
         selector += `:eq(${index})`;
@@ -226,7 +307,7 @@ class CapturerPanel {
       id: this._hotkeysCounter++,
       hotkey: hotkey,
       selector: selector,
-      action: '',
+      action: 'click',
       description: ''
     };
 

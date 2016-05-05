@@ -28,7 +28,7 @@ document.addEventListener(SET_CONFIG_COMMAND, (evt) => {
   };
 
   chrome.runtime.sendMessage(request, (response) => {
-    var event = new CustomEvent('set-config-success', { });
+    var event = new CustomEvent('set-config-success', { detail: config });
     document.dispatchEvent(event);
   });
 });
