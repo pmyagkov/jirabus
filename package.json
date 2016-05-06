@@ -49,6 +49,7 @@
     "watch": "gulp build:css && gulp watch:css"
   },
   "dependencies": {
-    "express": "^4.13.4"
+    "express": "^4.13.4",
+    "request": "^2.72.0"
   }
 }
