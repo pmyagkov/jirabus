@@ -1,4 +1,4 @@
-import CapturerPanel from './capturerPanel'
+import ExtensionPanel from './extensionPanel'
 import HotkeyCatcher from './hotkeyCatcher'
 import DomObserver from './domObserver'
 
@@ -7,12 +7,13 @@ import DomObserver from './domObserver'
  * @param config
  */
 let hotkeyCatcher;
-let capturer;
+let extensionPanel;
 let domObserver;
 
 function main(config) {
   hotkeyCatcher = new HotkeyCatcher(config);
-  capturer = new CapturerPanel(config);
+
+  extensionPanel = new ExtensionPanel(config);
   domObserver = new DomObserver(config);
 }
 

@@ -1,22 +1,22 @@
 import KeyboardDispatcher from './keyboardDispatcher'
 import EventDispatcher from 'common/eventDispatcher'
+import FeedbackPanel from './feedbackPanel'
 import CONSTS from 'common/consts'
 
 let $ = jQuery;
 
 class CapturerPanel {
-  constructor (config) {
+  constructor ({ config, $container }) {
     this._capturing = false;
     this._config = config;
     this._hotkeysCounter = 0;
 
-    this._createPanelDOM();
+    this._createPanelDOM($container);
     this._bindEvents();
   }
 
-  _createPanelDOM () {
+  _createPanelDOM ($container) {
     this._$panel = $(`<div class="capture-panel capture-panel_opened">
-      <a class="open-toggler" href="#"></a>
       <label for="indicator-checkbox" class="indicator">
         <input type="checkbox" id="indicator-checkbox" class="indicator-checkbox">
         <span class="indicator-icon"></span>
@@ -24,9 +24,8 @@ class CapturerPanel {
         <span class="indicator-text indicator-text_off"></span>
       </label>
       <ul class="hotkeys"></ul>
-    </div>`);
-
-    $(document.body).append(this._$panel);
+    </div>`)
+      .appendTo($container);
 
     this._$hotkeys = this._$panel.find('.hotkeys');
     let hotkeys = this._config.hotkeys;
@@ -80,7 +79,6 @@ class CapturerPanel {
 
   _bindEvents () {
     this._$panel.on('change', 'input[type="checkbox"]', this._onCaptureChange.bind(this));
-    this._$panel.on('click', '.open-toggler', this._onArrowClick.bind(this));
 
     this._$panel.on('mouseenter mouseleave', '.selector', this._onSelectorHover.bind(this));
 
@@ -239,26 +237,11 @@ class CapturerPanel {
       && panelOffset.top < selectedOffset.top
       && selectedOffset.top < panelOffset.top + this._$panel.height();
 
-    this._$panel.toggleClass('opaque', toggleOpacityValue);
+    this.dispatchEvent(CONSTS.event.toggleOpacity, toggleOpacityValue);
   }
 
   _onCaptureChange ($evt) {
     this[$evt.target.checked ? '_startCapture' : '_stopCapture']();
-  }
-
-  /**
-   *
-   * @param {Boolean?} value
-   * @private
-   */
-  _toggleOpenness (value) {
-    let baseClass = this._$panel[0].classList[0];
-
-    this._$panel.toggleClass(baseClass + '_opened', value);
-  }
-
-  _onArrowClick () {
-    this._toggleOpenness();
   }
 
   _isValidElement (target) {
@@ -390,7 +373,7 @@ class CapturerPanel {
     document.addEventListener('mouseout', this, true);
     document.addEventListener('click', this, true);
 
-    this._toggleOpenness(!this._capturing);
+    this.dispatchEvent(CONSTS.event.toggleOpenness, !this._capturing);
   }
 
   _stopCapture() {
@@ -401,7 +384,7 @@ class CapturerPanel {
     document.removeEventListener('mouseout', this, true);
     document.removeEventListener('click', this, true);
 
-    this._toggleOpenness(!this._capturing);
+    this.dispatchEvent(CONSTS.event.toggleOpenness, !this._capturing);
   }
 }
 

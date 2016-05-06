@@ -33,33 +33,49 @@ $bcolor = rgba(0,0,0,.2)
           0 - $swidth $swidth - 1 $swidth - 1 $docolor,
           - $swidth 0 $swidth - 1 $swidth - 1 $docolor
 
-.capture-panel
+input-bg-style()
+  background-color: white
+  border: 1px solid #D8D8D8
+  border-radius: 4px
+
+input-text-style()
+  line-height: 1.5
+  font-size: 15px
+  height: 25px
+  padding: 0 5px
+
+.extension-panel
   width: $pwidth
   box-sizing: border-box
   height: auto
   background: $pbg
   border: 1px solid $bcolor
 
-  padding: 0 20px
-
   z-index: 100
 
-
-  position: absolute;
-  right: - $pwidth - 2;
+  position: absolute
+  right: - $pwidth - 2
   transition: right .5s
-  top: 50px;
+  top: 50px
+
+  max-height: calc(100vh - 60px)
+
+  &__inner
+    overflow: auto
+    padding: 0 20px
 
   &_opened
     right: -2px
 
-
-  &.opaque
+  &_opaque
     opacity: .5
 
+  & a
+    color: cornflowerblue
+
   .open-toggler
-    position: absolute;
-    left: -29px
+    position: absolute
+    left: -31px
     top: -1px
     display: inline-block
     width: 30px
@@ -79,14 +95,21 @@ $bcolor = rgba(0,0,0,.2)
       width: 100%
       height: 100%
       font-size: 18px
-      padding: 0 5px
+      padding: 0 7px
 
-    .capture-panel_opened&::before
-      content: '→'
+  &_opened .open-toggler::before
+    content: '→'
 
 
+  & textarea, & input[type="text"]
+    input-bg-style()
+
+  & input[type="text"]
+    input-text-style()
+
+.capture-panel
   .indicator
-    display: inline-block;
+    display: inline-block
     padding: 3px 0
 
     cursor: pointer
@@ -96,9 +119,9 @@ $bcolor = rgba(0,0,0,.2)
       height: $iwidth
       border: $ocolor 2px solid
 
-      display: inline-block;
-      border-radius: 50%;
-      vertical-align: middle;
+      display: inline-block
+      border-radius: 50%
+      vertical-align: middle
 
       margin-top: -1px
 
@@ -160,26 +183,21 @@ $bcolor = rgba(0,0,0,.2)
 
   .hotkey
     width: 100px
+    text-align: center
 
   .selector
     width: 300px
     margin-right: $mr
 
-  & input[type="text"]
-    line-height: 1.5
-    font-size: 17px
-    padding: 0 5px
-
-
   & .hotkeys-item .command
-    color: #D04437
     margin-right: 8px
 
-  & .hotkeys-item .command_remove::before
-    content: 'Remove'
+  & .hotkeys-item .command_remove
+    color: #D04437
+    &::before
+      content: 'Remove'
 
   & .hotkeys-item .command_disable
-    color: #3f62d0
 
     &::before
       content: 'Disable'
@@ -188,5 +206,110 @@ $bcolor = rgba(0,0,0,.2)
     content: 'Enable'
 
 
+.feedback-panel
+  $border-color = #D8D8D8
+
+  font-size: 15px
+  overflow: hidden
+  margin: 0 -20px
+  padding: 10px 20px
+  border-top: 1px solid $border-color
+
+  .open-feedback-panel
+    display: inline-block
+
+    &::before
+      content: 'Give us some feedback or bugs'
+
+  .github-link
+    float: right
+
+    &__part-1
+      &::before
+        content: 'Made with '
+
+    &__heart
+      color: red
+
+      &::before
+        content: '❤'
+
+    &__part-2
+      &::before
+        content: ' by Pavel Myagkov'
+
+  .feedback-controls
+    display: none
+    overflow: hidden
 
 
+
+  .feedback-text-label
+    display: block
+    margin-bottom: 15px
+
+    .invalid &
+      border: 1px solid red
+
+    &::before
+      content: 'Leave your feedback here'
+
+  .feedback-text
+    margin-top: 5px
+    width: 440px
+    height: 120px
+    font-size: 14px
+
+    border-color: $border-color
+
+  .feedback-login-label
+    width: 360px
+    display: block
+    margin-bottom: 5px
+    margin-right: 7px
+
+    float: left
+
+    &::before
+      content: 'Leave your contact to be able to contact you (Telegram login is preferred)'
+
+  .feedback-login
+    margin-top: 5px
+    width: 200px
+    height: 20px
+    font-size: 15px
+
+    border-color: $border-color
+
+  .feedback-button
+    display: block
+    float: right
+    width: 80px
+    height: 25px
+    font-size: 15px
+    cursor: pointer
+
+    margin-top: 46px
+
+    transition: background-color .3s
+
+    input-bg-style()
+
+    &:hover
+      background-color: rgba(238, 238, 238, 0.5)
+
+    &::before
+      content: 'Send'
+
+      .loading &
+        content: 'Thanks!'
+
+  &.opened
+    .open-feedback-panel
+      display: none
+
+    .feedback-controls
+      display: block
+
+    .github-link
+      margin-top: 10px

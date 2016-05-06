@@ -11,7 +11,9 @@ const CONSTS = {
 
   event: {
     configSet: 'jb-config-set',
-    hotkey: 'jb-hotkey'
+    hotkey: 'jb-hotkey',
+    toggleOpenness: 'jb-toggle-openness',
+    toggleOpacity: 'jb-toggle-opacity'
   },
 
   dom: {
