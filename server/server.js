@@ -16,12 +16,17 @@ app.post('/feedback', function (req, res) {
   request.post({ url: url, form: data }, function (err, httpResponse, body) {
     console.log('BODY', body);
 
+    try {
+      body = JSON.parse(body);
+    } catch (e) {}
+
+
     var text;
     if (err || !body.ok) {
-      text = JSON.stringify(err) + '\n\n' + JSON.stringify(body);
+      text = 'Request error: ' + JSON.stringify(err) + '\n\n' + 'Response payload: ' + JSON.stringify(body);
       res.status(502).send(text);
     } else {
-      res.status(200).end();
+      res.status(200).end('Success!');
     }
 
   });
