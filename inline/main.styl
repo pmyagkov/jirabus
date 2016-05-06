@@ -1,5 +1,8 @@
-// highlight color
-$hcolor = red
+// outline color
+$ocolor = red
+// disabled color
+$docolor = #929292
+
 // shadow width
 $swidth = 2px
 // indicator width
@@ -11,16 +14,24 @@ $pwidth = 490px
 $pbg = #F5F5F5
 $bcolor = rgba(0,0,0,.2)
 
-.jirabus-hotkey
+.jb-hotkey-label
   margin-left: 5px
   font-weight: bold
 
-.jirabus-border
+
+.jb-outline
   box-shadow:
-          0 $swidth $swidth - 1 $swidth - 1 $hcolor,
-          $swidth 0 $swidth - 1 $swidth - 1 $hcolor,
-          0 - $swidth $swidth - 1 $swidth - 1 $hcolor,
-          - $swidth 0 $swidth - 1 $swidth - 1 $hcolor
+          0 $swidth $swidth - 1 $swidth - 1 $ocolor,
+          $swidth 0 $swidth - 1 $swidth - 1 $ocolor,
+          0 - $swidth $swidth - 1 $swidth - 1 $ocolor,
+          - $swidth 0 $swidth - 1 $swidth - 1 $ocolor
+
+.jb-disabled-outline
+  box-shadow:
+          0 $swidth $swidth - 1 $swidth - 1 $docolor,
+          $swidth 0 $swidth - 1 $swidth - 1 $docolor,
+          0 - $swidth $swidth - 1 $swidth - 1 $docolor,
+          - $swidth 0 $swidth - 1 $swidth - 1 $docolor
 
 .capture-panel
   width: $pwidth
@@ -83,7 +94,7 @@ $bcolor = rgba(0,0,0,.2)
     &-icon
       width: $iwidth
       height: $iwidth
-      border: $hcolor 2px solid
+      border: $ocolor 2px solid
 
       display: inline-block;
       border-radius: 50%;
@@ -114,7 +125,7 @@ $bcolor = rgba(0,0,0,.2)
       clip: rect(0,0,0,0)
 
       &:checked ~ .indicator-icon
-        background: $hcolor
+        background: $ocolor
 
       &:checked ~ .indicator-text_on
         display: inline-block
@@ -128,18 +139,17 @@ $bcolor = rgba(0,0,0,.2)
 .hotkeys
   // margin-right
   $mr = 20px
-  // margin-top
-  $mt = 10px
+  // vertical margin
+  $vm = 5px
 
   list-style: none
   padding: 0
 
   &-item
-    padding-top: $mt
+    padding: $vm 0 $vm 20px
     margin: 0 -20px
-    padding-left: 20px
 
-    &.disabled
+    &.jb-disabled
       background-color: #DADADA
 
       & input[type="text"]
@@ -174,9 +184,9 @@ $bcolor = rgba(0,0,0,.2)
     &::before
       content: 'Disable'
 
-  & .hotkeys-item.disabled .command_disable::before
+  & .hotkeys-item.jb-disabled .command_disable::before
     content: 'Enable'
 
-    
+
 
 

@@ -41,6 +41,8 @@ export default {
   },
 
   removeKeydownSymbol (symbol) {
+    this.__keydownSymbols = this.__keydownSymbols || [];
+
     this.__keydownSymbols = this.cutSymbolFromArray(this.__keydownSymbols, symbol);
   },
 

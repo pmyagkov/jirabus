@@ -1,3 +1,6 @@
+import CONSTS from 'common/consts'
+import EventDispatcher from 'common/eventDispatcher'
+
 function isCodeInlined(ext) {
   return !!document.getElementById(`jirabus-${ext}`);
 }
@@ -16,27 +19,22 @@ function inlineCode(ext, code, force) {
   return codeNode;
 }
 
-let GET_CODE_COMMAND = 'get-code';
-let SET_CONFIG_COMMAND = 'set-config';
-
-document.addEventListener(SET_CONFIG_COMMAND, (evt) => {
+document.addEventListener(CONSTS.command.setConfig, (evt) => {
   let config = evt.detail;
 
   let request = {
-    command: SET_CONFIG_COMMAND,
+    command: CONSTS.command.setConfig,
     data: config
   };
 
-  chrome.runtime.sendMessage(request, (response) => {
-    var event = new CustomEvent('set-config-success', { detail: config });
-    document.dispatchEvent(event);
-  });
+  chrome.runtime.sendMessage(request,
+    (response) => EventDispatcher.dispatchEvent(CONSTS.event.configSet, config));
 });
 
-chrome.runtime.sendMessage({ command: GET_CODE_COMMAND }, (response) => {
+chrome.runtime.sendMessage({ command: CONSTS.command.getCode }, (response) => {
   let { data, command } = response;
 
-  if (command !== GET_CODE_COMMAND) {
+  if (command !== CONSTS.command.getCode) {
     return;
   }
 
@@ -53,7 +51,7 @@ chrome.runtime.sendMessage({ command: GET_CODE_COMMAND }, (response) => {
 
     let codeNode = inlineCode(ext, code);
     if (ext === 'js') {
-      document.dispatchEvent(new CustomEvent('config', { 'detail':  config }));
+      EventDispatcher.dispatchEvent('config', config);
     }
   });
 

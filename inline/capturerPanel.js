@@ -1,4 +1,6 @@
 import KeyboardDispatcher from './keyboardDispatcher'
+import EventDispatcher from 'common/eventDispatcher'
+import CONSTS from 'common/consts'
 
 let $ = jQuery;
 
@@ -56,7 +58,7 @@ class CapturerPanel {
     let appendFunc = prepend ? 'prependTo' : 'appendTo';
 
     $container = $(`<li class="hotkeys-item" data-id="${hotkeyObj.id}">`)[appendFunc](this._$hotkeys);
-    $container.toggleClass('disabled', !!hotkeyObj.disabled);
+    $container.toggleClass(`${CONSTS.dom.disabledClass}`, !!hotkeyObj.disabled);
 
     $container
       .append(`<input type="text" class="selector" value="${hotkeyObj.selector}" placeholder="Choose an element to click">`);
@@ -68,10 +70,6 @@ class CapturerPanel {
       .appendTo($container)
       .append(`<a href="#" title="Remove" class="command command_remove"></a>`)
       .append(`<a href="#" class="command command_disable"></a>`);
-
-    /*$container
-     .append(`<button class="disable">Disable</button>`)
-     .append(`<button class="remove">Remove</button>`);*/
 
     return $container;
   }
@@ -92,8 +90,8 @@ class CapturerPanel {
     this._$panel.on('click', '.command_disable', this._onDisableHotkeyClick.bind(this));
 
     $(document)
-      .on('set-config-success', this._onConfigSet.bind(this))
-      .on('jirabus-hotkey', this._onHotkey.bind(this));
+      .on(CONSTS.event.configSet, this._onConfigSet.bind(this))
+      .on(CONSTS.event.hotkey, this._onHotkey.bind(this));
 
   }
 
@@ -118,19 +116,23 @@ class CapturerPanel {
     this._saveConfig();
   }
 
-  _onDisableHotkeyClick (evt) {
-    evt.preventDefault();
+  _onDisableHotkeyClick ($evt) {
+    $evt.preventDefault();
 
-    const { $container, id } = this._getHotkeyContainerByTarget(evt.target);
-    $container.toggleClass('disabled');
+    const { $container, id } = this._getHotkeyContainerByTarget($evt.target);
+    $container.toggleClass(`${CONSTS.dom.disabledClass}`);
 
     this._toggleHotkey(id);
   }
 
-  _onRemoveHotkeyClick (evt) {
-    evt.preventDefault();
+  _onRemoveHotkeyClick ($evt) {
+    $evt.preventDefault();
 
-    const { $container, id } = this._getHotkeyContainerByTarget(evt.target);
+    const { $container, id } = this._getHotkeyContainerByTarget($evt.target);
+    const hotkeyObj = this._getHotkeyById(id);
+    if (hotkeyObj) {
+      $(hotkeyObj.selector).removeClass(CONSTS.dom.outlineClass);
+    }
     $container.remove();
 
     this._removeHotkeyFromConfig(id);
@@ -141,8 +143,8 @@ class CapturerPanel {
     this._saveConfig();
   }
 
-  _onHotkey (evt) {
-    const hotkey = evt.originalEvent.detail;
+  _onHotkey ($evt) {
+    const hotkey = $evt.originalEvent.detail;
 
     let hotkeyObj = this._getHotkeyObjByHotkey(hotkey);
     if (!hotkeyObj) {
@@ -174,7 +176,8 @@ class CapturerPanel {
   }
 
   _onConfigSet () {
-    this._$panel.find('.loading').each((i, el) => $(el).removeClass('loading'));
+    this._$panel.find(`.${CONSTS.dom.loadingClass}`)
+      .each((i, el) => $(el).removeClass(`${CONSTS.dom.loadingClass}`));
   }
 
   _onHotkeyFocusChange (evt) {
@@ -207,7 +210,7 @@ class CapturerPanel {
   }
 
   _saveConfig () {
-    document.dispatchEvent(new CustomEvent('set-config', { 'detail':  this._config }));
+    this.dispatchEvent(CONSTS.command.setConfig, this._config);
   }
 
   _onSelectorHover (evt) {
@@ -219,7 +222,14 @@ class CapturerPanel {
       return;
     }
 
-    $selected.toggleClass('jirabus-border', hoverValue);
+    const { id } = this._getHotkeyContainerByTarget(evt.target);
+    const hotkeyObj = this._getHotkeyById(id);
+    let disabled = false;
+    if (hotkeyObj) {
+      disabled = hotkeyObj.disabled;
+    }
+
+    $selected.toggleClass(disabled ? CONSTS.dom.disabledOutlineClass : CONSTS.dom.outlineClass, hoverValue);
 
     let selectedOffset = $selected.offset();
     let panelOffset = this._$panel.offset();
@@ -232,8 +242,8 @@ class CapturerPanel {
     this._$panel.toggleClass('opaque', toggleOpacityValue);
   }
 
-  _onCaptureChange (evt) {
-    this[evt.target.checked ? '_startCapture' : '_stopCapture']();
+  _onCaptureChange ($evt) {
+    this[$evt.target.checked ? '_startCapture' : '_stopCapture']();
   }
 
   /**
@@ -278,20 +288,16 @@ class CapturerPanel {
 
     switch (evt.type) {
       case 'mouseover':
-        return this._onCaptureMouseOver(evt.target);
+        return this._onCaptureHover(evt.target, true);
       case 'mouseout':
-        return this._onCaptureMouseLeave(evt.target);
+        return this._onCaptureHover(evt.target, false);
       case 'click':
         return this._onCaptureClick(evt.target);
     }
   }
 
-  _onCaptureMouseOver (target) {
-    target.classList && target.classList.add('jirabus-border');
-  }
-
-  _onCaptureMouseLeave (target) {
-    target.classList && target.classList.remove('jirabus-border');
+  _onCaptureHover (target, value) {
+    target.classList && target.classList.toggle(CONSTS.dom.outlineClass, value);
   }
 
   _onCaptureClick (target) {
@@ -398,5 +404,7 @@ class CapturerPanel {
     this._toggleOpenness(!this._capturing);
   }
 }
+
+Object.assign(CapturerPanel.prototype, EventDispatcher);
 
 export default CapturerPanel

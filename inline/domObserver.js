@@ -1,4 +1,4 @@
-
+import CONSTS from 'common/consts'
 
 let $ = jQuery;
 
@@ -15,8 +15,7 @@ class DomObserver {
   }
 
   _bindEvents () {
-    $(document).on('set-config-success', this._onConfigSet.bind(this));
-
+    $(document).on(CONSTS.event.configSet, this._onConfigSet.bind(this));
   }
 
   _startObserving () {
@@ -43,22 +42,24 @@ class DomObserver {
   }
 
   _labelHotkey (hotkeyObj) {
+    const { hotkeyLabelClass, processedAttr } = CONSTS.dom;
+
     let target = jQuery(hotkeyObj.selector)[0];
     console.log(hotkeyObj.selector);
 
-    if (!target || target.getAttribute('data-jirabus')) {
+    if (!target || target.getAttribute(processedAttr)) {
       console.log('NO NODE or ALREADY PROCESSED');
       return;
     }
 
     let $hotkeyElement = jQuery('<span>')
-      .addClass('jirabus-hotkey')
+      .addClass(`${hotkeyLabelClass}`)
       .text(hotkeyObj.hotkey);
 
     console.log('PROCESS', target);
 
     // TODO: надо сделать интеллектуальный поиск ноды с текстом
-    let $target = jQuery(target).attr('data-jirabus', 'true');
+    let $target = jQuery(target).attr(processedAttr, 'true');
     // для случая кнопок-действия
     let $textNode = $target.find('.trigger-label');
     if (!$textNode.length) {
@@ -71,9 +72,11 @@ class DomObserver {
   _labelTargets (force) {
     console.group('LABEL ACTIONS');
 
+    const { hotkeyLabelClass, processedAttr } = CONSTS.dom;
+
     if (force) {
-      $('.jirabus-hotkey').each((i, e) => $(e).remove());
-      $('[data-jirabus]').each((i, e) => $(e).removeAttr('data-jirabus'));
+      $(`.${hotkeyLabelClass}`).each((i, e) => $(e).remove());
+      $(`[${processedAttr}]`).each((i, e) => $(e).removeAttr(processedAttr));
     }
 
     this._config.hotkeys
