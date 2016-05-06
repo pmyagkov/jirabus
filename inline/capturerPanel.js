@@ -95,6 +95,8 @@ class CapturerPanel {
   }
 
   _onRemoveHotkeyClick (evt) {
+    evt.preventDefault();
+
     const $hotkeyContainer = $(evt.target).closest('[data-id]');
     const id = $hotkeyContainer.data('id');
 
