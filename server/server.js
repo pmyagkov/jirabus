@@ -6,11 +6,12 @@ var request = require('request');
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.post('/feedback', function (req, res) {
+  var text = req.body.text || 'No text sent';
   var name = req.body.name || 'Anonymous';
 
-  var text = req.body.text + '\n\n' + name;
+  var message = text + '\n\n' + name;
   var url = 'https://api.telegram.org/bot190843896:AAFchCFzLnhq-H9FG0wZABviItMBA3_HCuo/sendMessage';
-  var data = {chat_id: '@JIRAbusFeedback', text: text};
+  var data = {chat_id: '@JIRAbusFeedback', text: message};
 
   request.post({ url: url, form: data }, function (err, httpResponse, body) {
     console.log('BODY', body);
