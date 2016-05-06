@@ -190,6 +190,7 @@ class HotkeyCatcher {
     this._currentNode = this._root;
 
     this._hotkeys
+      .filter((hotkeyObj) => !hotkeyObj.disabled)
       .map((hotkeyObj) => hotkeyObj.hotkey)
       .forEach((hotkey) => this._buildHotkeyBranch(hotkey));
   }
@@ -217,8 +218,9 @@ class HotkeyCatcher {
     let symbol = KeyboardDispatcher.resolveKeyFromEvent(evt);
     let traverse;
 
+    // TODO: if shortcut is `l` `Cmd + l` is caught as well
     if (evt.type === 'keydown') {
-      console.group('KEYDOWN');
+      console.group('KEYDOWN', this.__keydownSymbols);
 
       // timeout passed, reset the node pointer
       if (this.isEventTimeoutExpired(this._delay)) {

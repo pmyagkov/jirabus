@@ -56,6 +56,7 @@ class CapturerPanel {
     let appendFunc = prepend ? 'prependTo' : 'appendTo';
 
     $container = $(`<li class="hotkeys-item" data-id="${hotkeyObj.id}">`)[appendFunc](this._$hotkeys);
+    $container.toggleClass('disabled', !!hotkeyObj.disabled);
 
     $container
       .append(`<input type="text" class="selector" value="${hotkeyObj.selector}" placeholder="Choose an element to click">`);
@@ -65,7 +66,8 @@ class CapturerPanel {
 
     $(`<div class="hotkeys-item__commands"></div>`)
       .appendTo($container)
-      .append(`<a href="#" title="Remove" class="command command_remove">Remove</a>`);
+      .append(`<a href="#" title="Remove" class="command command_remove"></a>`)
+      .append(`<a href="#" class="command command_disable"></a>`);
 
     /*$container
      .append(`<button class="disable">Disable</button>`)
@@ -87,6 +89,7 @@ class CapturerPanel {
     this._$panel.on('focusin focusout', '.hotkey', this._onHotkeyFocusChange.bind(this));
 
     this._$panel.on('click', '.command_remove', this._onRemoveHotkeyClick.bind(this));
+    this._$panel.on('click', '.command_disable', this._onDisableHotkeyClick.bind(this));
 
     $(document)
       .on('set-config-success', this._onConfigSet.bind(this))
@@ -94,13 +97,41 @@ class CapturerPanel {
 
   }
 
+  _getHotkeyContainerByTarget (target) {
+    const $container = $(target).closest('[data-id]');
+    const id = $container.data('id');
+
+    return { $container, id };
+  }
+
+  /**
+   * Toggle `disabled` state of the hotkey.
+   * @param id
+   * @private
+   */
+  _toggleHotkey (id) {
+    const hotkeyObj = this._getHotkeyById(id);
+    if (hotkeyObj) {
+      hotkeyObj.disabled = !hotkeyObj.disabled;
+    }
+
+    this._saveConfig();
+  }
+
+  _onDisableHotkeyClick (evt) {
+    evt.preventDefault();
+
+    const { $container, id } = this._getHotkeyContainerByTarget(evt.target);
+    $container.toggleClass('disabled');
+
+    this._toggleHotkey(id);
+  }
+
   _onRemoveHotkeyClick (evt) {
     evt.preventDefault();
 
-    const $hotkeyContainer = $(evt.target).closest('[data-id]');
-    const id = $hotkeyContainer.data('id');
-
-    $hotkeyContainer.remove();
+    const { $container, id } = this._getHotkeyContainerByTarget(evt.target);
+    $container.remove();
 
     this._removeHotkeyFromConfig(id);
   }

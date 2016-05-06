@@ -5,7 +5,7 @@ $swidth = 2px
 // indicator width
 $iwidth = 16px
 
-$pwidth = 500px
+$pwidth = 490px
 
 // panel background
 $pbg = #F5F5F5
@@ -128,18 +128,25 @@ $bcolor = rgba(0,0,0,.2)
 .hotkeys
   // margin-right
   $mr = 20px
-  // margin-bottom
-  $mb = 10px
+  // margin-top
+  $mt = 10px
 
   list-style: none
   padding: 0
 
   &-item
-    margin-bottom: $mb
+    padding-top: $mt
+    margin: 0 -20px
+    padding-left: 20px
+
+    &.disabled
+      background-color: #DADADA
+
+      & input[type="text"]
+        color: #808080
 
     &__commands
       padding: 3px 0 0 7px
-
 
   .hotkey
     width: 100px
@@ -154,7 +161,22 @@ $bcolor = rgba(0,0,0,.2)
     padding: 0 5px
 
 
-  & .command
+  & .hotkeys-item .command
     color: #D04437
+    margin-right: 8px
+
+  & .hotkeys-item .command_remove::before
+    content: 'Remove'
+
+  & .hotkeys-item .command_disable
+    color: #3f62d0
+
+    &::before
+      content: 'Disable'
+
+  & .hotkeys-item.disabled .command_disable::before
+    content: 'Enable'
+
+    
 
 

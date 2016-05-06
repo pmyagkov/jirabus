@@ -42,39 +42,43 @@ class DomObserver {
     this._labelTargets(true);
   }
 
+  _labelHotkey (hotkeyObj) {
+    let target = jQuery(hotkeyObj.selector)[0];
+    console.log(hotkeyObj.selector);
+
+    if (!target || target.getAttribute('data-jirabus')) {
+      console.log('NO NODE or ALREADY PROCESSED');
+      return;
+    }
+
+    let $hotkeyElement = jQuery('<span>')
+      .addClass('jirabus-hotkey')
+      .text(hotkeyObj.hotkey);
+
+    console.log('PROCESS', target);
+
+    // TODO: надо сделать интеллектуальный поиск ноды с текстом
+    let $target = jQuery(target).attr('data-jirabus', 'true');
+    // для случая кнопок-действия
+    let $textNode = $target.find('.trigger-label');
+    if (!$textNode.length) {
+      $textNode = $target;
+    }
+
+    $textNode.append($hotkeyElement);
+  }
+
   _labelTargets (force) {
     console.group('LABEL ACTIONS');
 
     if (force) {
       $('.jirabus-hotkey').each((i, e) => $(e).remove());
+      $('[data-jirabus]').each((i, e) => $(e).removeAttr('data-jirabus'));
     }
 
-    this._config.hotkeys.forEach((hotkeyObj) => {
-      let target = jQuery(hotkeyObj.selector)[0];
-      console.log(hotkeyObj.selector);
-
-      if (!target || (!force && target.getAttribute('data-jirabus'))) {
-        console.log('NO NODE or ALREADY PROCESSED');
-        return;
-      }
-
-      let $hotkeyElement = jQuery('<span>')
-        .addClass('jirabus-hotkey')
-        .text(hotkeyObj.hotkey);
-
-      console.log('PROCESS', target);
-
-      // TODO: надо сделать интеллектуальный поиск ноды с текстом
-      let $target = jQuery(target).attr('data-jirabus', 'true');
-      // для случая кнопок-действия
-      let $textNode = $target.find('.trigger-label');
-      if (!$textNode.length) {
-        $textNode = $target;
-      }
-
-      $textNode.append($hotkeyElement);
-
-    });
+    this._config.hotkeys
+      .filter((hotkeyObj) => !hotkeyObj.disabled)
+      .forEach((hotkeyObj) => this._labelHotkey(hotkeyObj));
 
     console.groupEnd();
   }
