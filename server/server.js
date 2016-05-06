@@ -14,12 +14,13 @@ app.post('/feedback', function (req, res) {
   var data = {chat_id: '@JIRAbusFeedback', text: message};
 
   request.post({ url: url, form: data }, function (err, httpResponse, body) {
-    console.log('BODY', body);
+    console.log('TELEGRAM RESPONSE', body);
 
     try {
       body = JSON.parse(body);
     } catch (e) {}
 
+    res.set('Access-Control-Allow-Origin', '*');
 
     var text;
     if (err || !body.ok) {
