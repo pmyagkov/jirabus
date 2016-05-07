@@ -19,17 +19,28 @@ function inlineCode(ext, code, force) {
   return codeNode;
 }
 
-document.addEventListener(CONSTS.command.setConfig, (evt) => {
-  let config = evt.detail;
+const commandEventHash = {
+  [CONSTS.command.setConfig] : CONSTS.event.configSet,
+  [CONSTS.command.sendFeedback] : CONSTS.event.feedbackSent
+};
 
-  let request = {
-    command: CONSTS.command.setConfig,
-    data: config
-  };
+function bindEvents () {
+  Object.keys(commandEventHash).forEach((command) => {
+    document.addEventListener(command, onCommand);
+  });
+}
 
-  chrome.runtime.sendMessage(request,
-    (response) => EventDispatcher.dispatchEvent(CONSTS.event.configSet, config));
-});
+function onCommand (evt) {
+  let data = evt.detail;
+  let command = evt.type;
+
+  chrome.runtime.sendMessage({ command, data },
+    (response) => {
+      EventDispatcher.dispatchEvent(commandEventHash[command], response.data)
+    });
+}
+
+bindEvents();
 
 chrome.runtime.sendMessage({ command: CONSTS.command.getCode }, (response) => {
   let { data, command } = response;

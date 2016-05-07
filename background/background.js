@@ -271,7 +271,7 @@ class BackgroundPage {
     console.log('request', request);
     console.log('sender', sender);
 
-    console.log(`${request.command} command came`);
+    console.log(`${request.command} command came`, request.data);
 
     switch (request.command) {
       case CONSTS.command.getCode:
@@ -313,15 +313,50 @@ class BackgroundPage {
       case CONSTS.command.setConfig:
         this.setConfig(request.data)
           .then(() => {
+            let response = request;
+
+            console.log('Sending response', response);
+
+            sendResponse(response);
+          });
+
+        return true;
+
+      case CONSTS.command.sendFeedback:
+        this.sendFeedback(request.data)
+          .then((status) => {
             let response = {
-              command: request.command
+              command: request.command,
+              data: status
             };
 
             console.log('Sending response', response);
 
             sendResponse(response);
-          })
+          });
+
+        return true;
     }
+  }
+
+  sendFeedback (data) {
+    return new Promise((resolve, reject) => {
+      let xhr = new XMLHttpRequest();
+      xhr.open('POST', 'http://deardeerart.ru/jirabus/feedback', true);
+
+      xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+
+      xhr.onreadystatechange = function() {
+        resolve(xhr.status);
+      };
+
+      let paramString = Object.keys(data).map((key) => {
+        return `${key}=${data[key]}`;
+      }).join('&');
+
+      xhr.send(paramString);
+    });
+
   }
 
   errorHandler () {

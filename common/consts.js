@@ -6,11 +6,13 @@ const CONSTS = {
   command: {
     getCode: 'jb-get-code',
     getConfig: 'jb-get-config',
-    setConfig: 'jb-set-config'
+    setConfig: 'jb-set-config',
+    sendFeedback: 'jb-send-feedback'
   },
 
   event: {
     configSet: 'jb-config-set',
+    feedbackSent: 'jb-feedback-sent',
     hotkey: 'jb-hotkey',
     toggleOpenness: 'jb-toggle-openness',
     toggleOpacity: 'jb-toggle-opacity'
