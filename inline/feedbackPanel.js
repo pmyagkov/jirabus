@@ -60,7 +60,6 @@ class FeedbackPanel {
     const $login = this._$panel.find('.feedback-login');
 
     let login = $login.val();
-    login = login === '@' ? null : login;
 
     if (!$text.val().trim()) {
       this._toggleMod(this._$panel, 'invalid', true);

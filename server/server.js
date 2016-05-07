@@ -7,7 +7,10 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.post('/feedback', function (req, res) {
   var text = req.body.text || 'No text sent';
-  var name = req.body.name || 'Anonymous';
+  var name = req.body.name;
+  if (!name || name === '@') {
+    name = 'Anonymous';
+  }
 
   var message = text + '\n\n' + name;
   var url = 'https://api.telegram.org/bot190843896:AAFchCFzLnhq-H9FG0wZABviItMBA3_HCuo/sendMessage';
