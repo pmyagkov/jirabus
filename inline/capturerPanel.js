@@ -1,14 +1,17 @@
 import KeyboardDispatcher from './keyboardDispatcher'
 import EventDispatcher from 'common/eventDispatcher'
 import FeedbackPanel from './feedbackPanel'
+import ErrorHandler from 'common/errorHandler'
 import CONSTS from 'common/consts'
 
 import DomHelper from './domHelper'
 
 let $ = jQuery;
 
-class CapturerPanel {
+class CapturerPanel extends ErrorHandler {
   constructor ({ config, $container }) {
+    super();
+
     this._capturing = false;
     this._config = config;
     this._hotkeysCounter = 0;
@@ -245,7 +248,7 @@ class CapturerPanel {
   }
 
   _saveConfig () {
-    this.dispatchEvent(CONSTS.command.setConfig, this._config);
+    EventDispatcher.dispatchEvent(CONSTS.command.setConfig, this._config);
   }
 
   _onSelectorHover (evt) {
@@ -276,7 +279,7 @@ class CapturerPanel {
     }
 
     $selected.toggleClass(disabled ? CONSTS.dom.disabledOutlineClass : CONSTS.dom.outlineClass, hoverValue);
-    this.dispatchEvent(CONSTS.event.toggleOpacity, toggleOpacityValue);
+    EventDispatcher.dispatchEvent(CONSTS.event.toggleOpacity, toggleOpacityValue);
 
   }
 
@@ -413,7 +416,7 @@ class CapturerPanel {
     document.addEventListener('mouseout', this, true);
     document.addEventListener('click', this, true);
 
-    this.dispatchEvent(CONSTS.event.toggleOpenness, !this._capturing);
+    EventDispatcher.dispatchEvent(CONSTS.event.toggleOpenness, !this._capturing);
   }
 
   _stopCapture() {
@@ -424,10 +427,8 @@ class CapturerPanel {
     document.removeEventListener('mouseout', this, true);
     document.removeEventListener('click', this, true);
 
-    this.dispatchEvent(CONSTS.event.toggleOpenness, !this._capturing);
+    EventDispatcher.dispatchEvent(CONSTS.event.toggleOpenness, !this._capturing);
   }
 }
-
-Object.assign(CapturerPanel.prototype, EventDispatcher);
 
 export default CapturerPanel

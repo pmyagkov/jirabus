@@ -187,12 +187,11 @@ class HotkeyCatcher {
   _triggerHotkeyEvent (hotkey) {
     console.log('Hotkey found!', hotkey);
 
-    this.dispatchEvent(CONSTS.event.hotkey, hotkey);
+    EventDispatcher.dispatchEvent(CONSTS.event.hotkey, hotkey);
 
   }
 }
 
 Object.assign(HotkeyCatcher.prototype, KeydownMixin);
-Object.assign(HotkeyCatcher.prototype, EventDispatcher);
 
 export default HotkeyCatcher
