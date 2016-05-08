@@ -3,7 +3,7 @@
 
   "name": "JIRAbus",
   "version": "0.0.1",
-  "description": "Keyboard enhancer for Atlassian JIRA",
+  "description": "Productivity keyboard shortcut enhancer",
   "background": {
     "scripts": [
       "js/background.js"
@@ -20,8 +20,17 @@
     }
   ],
   "page_action": {
-    "default_icon": "img/jira.png",
+    "default_icon": {
+      "19": "img/icon19.png",
+      "38": "img/icon38.png"
+    },
     "default_title": "JIRAbus"
+  },
+  "icons": { 
+    "16": "img/icon16.png",
+    "32": "img/icon32.png",
+    "48": "img/icon48.png",
+    "128": "img/icon128.png" 
   },
   "permissions" : [
     "tabs",

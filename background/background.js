@@ -256,7 +256,7 @@ class BackgroundPage extends ErrorHandler {
 
     chrome.pageAction.setIcon({
       tabId: sender.tab.id,
-      path: this.getImagePath('jira_connected.png')
+      path: this.getImagePath('icon_h38.png')
     });
 
     console.log('connectTab', `Tab ${sender.tab.id} is connected`);
