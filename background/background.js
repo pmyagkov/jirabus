@@ -1,4 +1,5 @@
 import CONSTS from 'common/consts'
+import ErrorHandler from 'common/errorHandler'
 
 const RELATIVE_HOTKEYS_CONFIG = [
   {
@@ -118,7 +119,7 @@ const REST_CONFIG = {
 
 const CONFIG_STORAGE_KEY = 'config';
 
-class BackgroundPage {
+class BackgroundPage extends ErrorHandler {
 
   checkConfigInStorage () {
     console.group('Background.checkConfigInStorage');
@@ -180,7 +181,8 @@ class BackgroundPage {
   }
 
   constructor () {
-
+    super();
+    
     this.checkConfigInStorage().then(() => {
       this.registerListeners();
 

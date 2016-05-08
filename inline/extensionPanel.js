@@ -1,11 +1,14 @@
 import CapturerPanel from './capturerPanel'
 import FeedbackPanel from './feedbackPanel'
+import ErrorHandler from 'common/errorHandler'
 import CONSTS from 'common/consts'
 
 const $ = jQuery;
 
-class ExtensionPanel {
+class ExtensionPanel extends ErrorHandler {
   constructor (config) {
+    super();
+
     this._createPanelDOM();
 
     this._bindEvents();

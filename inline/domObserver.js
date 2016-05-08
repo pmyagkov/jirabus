@@ -1,9 +1,12 @@
 import CONSTS from 'common/consts'
+import ErrorHandler from 'common/errorHandler'
 
 let $ = jQuery;
 
-class DomObserver {
+class DomObserver extends ErrorHandler {
   constructor (config) {
+    super();
+
     this._config = config;
 
     this._labelTargets();

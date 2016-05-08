@@ -1,11 +1,14 @@
 import EventDispatcher from 'common/eventDispatcher'
 import DomHelper from './domHelper'
+import ErrorHandler from 'common/errorHandler'
 import CONSTS from 'common/consts'
 
 const $ = jQuery;
 
-class FeedbackPanel {
+class FeedbackPanel extends ErrorHandler {
   constructor ($container) {
+    super();
+
     this._createPanelDOM($container);
 
     this._bindEvents();
@@ -69,7 +72,7 @@ class FeedbackPanel {
 
     DomHelper.toggleMod(this._$panel, 'loading', true);
 
-    this.dispatchEvent(CONSTS.command.sendFeedback, {
+    EventDispatcher.dispatchEvent(CONSTS.command.sendFeedback, {
       name: login,
       text: $text.val()
     });
@@ -148,7 +151,5 @@ class FeedbackPanel {
     `);
   }
 }
-
-Object.assign(FeedbackPanel.prototype, EventDispatcher);
 
 export default FeedbackPanel
