@@ -38,8 +38,6 @@
     "build": "gulp build",
     "build:js": "gulp build:js",
     "build:css": "gulp build:css",
-    "clean:report": "rm -rf ./report",
-    "dev": "node ./build/webpack-dev-server.js",
     "minify": "gulp minify",
     "minify:css": "gulp minify:css",
     "minify:js": "gulp minify:js",
@@ -47,7 +45,9 @@
     "size-report": "gulp report",
     "test": "karma start test/karma-conf.js --singleRun",
     "test:dev": "karma start test/karma-conf.js --reporters=mocha",
-    "watch": "gulp build:css && gulp watch:css"
+    "watch": "gulp build:css && gulp watch:css",
+
+    "server": "node server/server.js"
   },
   "dependencies": {
     "express": "^4.13.4",

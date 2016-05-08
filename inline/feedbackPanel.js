@@ -20,7 +20,9 @@ class FeedbackPanel {
   }
 
   _clearFeedbackForm () {
-    this._$panel.find('textarea, input[type=text]').each((i, e) => $(e).val(''));
+    this._$panel
+      .find('.feedback-text').val('').end()
+      .find('.feedback-login').val('@');
   }
 
   _toggleError (value, statusCode) {
@@ -78,12 +80,16 @@ class FeedbackPanel {
 
   _toggleOpenness(value) {
     this._toggleMod(this._$panel, 'opened', value);
+
+    if (!value) {
+      this._toggleError(false);
+      this._clearFeedbackForm();
+    }
   }
 
   _onClosePanelClick (evt) {
     evt.preventDefault();
 
-    this._toggleError(false);
     this._toggleOpenness(false);
   }
 

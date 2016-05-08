@@ -227,17 +227,20 @@ class CapturerPanel {
       disabled = hotkeyObj.disabled;
     }
 
+    let toggleOpacityValue = false;
+    if (hoverValue) {
+      let selectedOffset = $selected.offset();
+      let panelOffset = this._$panel.offset();
+
+      toggleOpacityValue = panelOffset.left < selectedOffset.left
+        && selectedOffset.left < panelOffset.left + this._$panel.width()
+        && panelOffset.top < selectedOffset.top
+        && selectedOffset.top < panelOffset.top + this._$panel.height();
+    }
+
     $selected.toggleClass(disabled ? CONSTS.dom.disabledOutlineClass : CONSTS.dom.outlineClass, hoverValue);
-
-    let selectedOffset = $selected.offset();
-    let panelOffset = this._$panel.offset();
-
-    const toggleOpacityValue = panelOffset.left < selectedOffset.left
-      && selectedOffset.left < panelOffset.left + this._$panel.width()
-      && panelOffset.top < selectedOffset.top
-      && selectedOffset.top < panelOffset.top + this._$panel.height();
-
     this.dispatchEvent(CONSTS.event.toggleOpacity, toggleOpacityValue);
+
   }
 
   _onCaptureChange ($evt) {
