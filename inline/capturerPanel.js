@@ -3,6 +3,8 @@ import EventDispatcher from 'common/eventDispatcher'
 import FeedbackPanel from './feedbackPanel'
 import CONSTS from 'common/consts'
 
+import DomHelper from './domHelper'
+
 let $ = jQuery;
 
 class CapturerPanel {
@@ -68,7 +70,8 @@ class CapturerPanel {
     $(`<div class="hotkeys-item__commands"></div>`)
       .appendTo($container)
       .append(`<a href="#" title="Remove" class="command command_remove"></a>`)
-      .append(`<a href="#" class="command command_disable"></a>`);
+      .append(`<a href="#" class="command command_disable"></a>`)
+      .append(`<div class="hotkey-error"></div>`);
 
     return $container;
   }
@@ -178,18 +181,52 @@ class CapturerPanel {
       .each((i, el) => $(el).removeClass(`${CONSTS.dom.loadingClass}`));
   }
 
+  _checkSameHotkeys (hotkey, id) {
+    return this._config.hotkeys
+      .filter((hotkeyObj) => hotkeyObj.hotkey === hotkey && hotkeyObj.id !== id)
+      .map((hotkeyObj) => hotkeyObj.id);
+  }
+
   _onHotkeyFocusChange (evt) {
     let focusValue = evt.type === 'focusin';
+
+    const $container = $(evt.target).closest('.hotkeys-item');
 
     if (focusValue) {
       KeyboardDispatcher.connect(evt.target);
       $(evt.target).val('');
+
+      $container.find('.hotkey-error').text('');
+      this._$panel
+        .find('.hotkeys-item')
+        .each((i, e) => DomHelper.toggleMod(e, 'invalid-hotkey invalid', false));
+
     } else {
 
+      // validation
       let hotkey = KeyboardDispatcher.disconnect(evt.target);
-      let id = $(evt.target).closest('.hotkeys-item').data('id');
+      let id = $container.data('id');
 
-      this._setHotkey(hotkey, id);
+      let $error = $container.find('.hotkey-error');
+      if (!hotkey) {
+        $error.text('No hotkey provided');
+        DomHelper.toggleMod($container, 'invalid invalid-hotkey', true);
+      } else {
+        let sameHotkeyIds = this._checkSameHotkeys(hotkey, id);
+        if (sameHotkeyIds.length) {
+          this._$panel
+            .find('.hotkeys-item')
+            .filter((i, e) => sameHotkeyIds.includes($(e).data('id')))
+            .each((i, e) => DomHelper.toggleMod(e, 'invalid-hotkey', true));
+
+          $error.text('Provide different hotkey');
+          DomHelper.toggleMod($container, 'invalid invalid-hotkey', true);
+
+        } else {
+          this._setHotkey(hotkey, id);
+        }
+
+      }
     }
   }
 

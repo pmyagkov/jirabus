@@ -1,4 +1,5 @@
 import EventDispatcher from 'common/eventDispatcher'
+import DomHelper from './domHelper'
 import CONSTS from 'common/consts'
 
 const $ = jQuery;
@@ -39,7 +40,7 @@ class FeedbackPanel {
     if (statusCode === 200) {
       setTimeout(() => {
         this._clearFeedbackForm();
-        this._toggleMod(this._$panel, 'loading', false);
+        DomHelper.toggleMod(this._$panel, 'loading', false);
         this._toggleOpenness();
       }, 1000);
     } else {
@@ -48,11 +49,7 @@ class FeedbackPanel {
   }
 
   _onFeedbackTextKeydown () {
-    this._toggleMod(this._$panel, 'invalid', false);
-  }
-
-  _toggleMod ($target, mod, value) {
-    this._$panel.toggleClass(`${$target[0].classList[0]}_${mod}`, value);
+    DomHelper.toggleMod(this._$panel, 'invalid', false);
   }
 
   _onSubmit (evt) {
@@ -64,13 +61,13 @@ class FeedbackPanel {
     let login = $login.val();
 
     if (!$text.val().trim()) {
-      this._toggleMod(this._$panel, 'invalid', true);
+      DomHelper.toggleMod(this._$panel, 'invalid', true);
       $text.focus();
 
       return false;
     }
 
-    this._toggleMod(this._$panel, 'loading', true);
+    DomHelper.toggleMod(this._$panel, 'loading', true);
 
     this.dispatchEvent(CONSTS.command.sendFeedback, {
       name: login,
@@ -79,7 +76,7 @@ class FeedbackPanel {
   }
 
   _toggleOpenness(value) {
-    this._toggleMod(this._$panel, 'opened', value);
+    DomHelper.toggleMod(this._$panel, 'opened', value);
 
     if (!value) {
       this._toggleError(false);

@@ -160,51 +160,62 @@ input-text-style()
 
 
 .hotkeys
+  list-style: none
+  padding: 0
+
+.hotkeys-item
   // margin-right
   $mr = 20px
   // vertical margin
   $vm = 5px
 
-  list-style: none
-  padding: 0
+  padding: $vm 21px
+  margin: 0 -20px
 
-  &-item
-    padding: $vm 0 $vm 20px
-    margin: 0 -20px
+  &.jb-disabled
+    background-color: #DADADA
 
-    &.jb-disabled
-      background-color: #DADADA
+    & input[type="text"]
+      color: #808080
+      text-decoration: line-through
 
-      & input[type="text"]
-        color: #808080
-        text-decoration: line-through
+  &__commands
+    padding: 3px 0 0 7px
 
-    &__commands
-      padding: 3px 0 0 7px
-
-  .hotkey
+  & .hotkey
     width: 100px
     text-align: center
 
-  .selector
+  & .selector
     width: 300px
     margin-right: $mr
 
-  & .hotkeys-item .command
-    margin-right: 8px
+  & .hotkey-error
+    color: red
+    float: right
+    display: none
 
-  & .hotkeys-item .command_remove
-    color: #D04437
-    &::before
-      content: 'Remove'
+  &_invalid .hotkey-error
+    display: block
 
-  & .hotkeys-item .command_disable
+  &_invalid-hotkey .hotkey
+    outline: red auto 5px
 
-    &::before
-      content: 'Disable'
+& .hotkeys-item .command
+  margin-right: 8px
 
-  & .hotkeys-item.jb-disabled .command_disable::before
-    content: 'Enable'
+& .hotkeys-item .command_remove
+  color: #D04437
+  &::before
+    content: 'Remove'
+
+& .hotkeys-item .command_disable
+
+  &::before
+    content: 'Disable'
+
+& .hotkeys-item.jb-disabled .command_disable::before
+  content: 'Enable'
 
 
 .feedback-panel
