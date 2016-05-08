@@ -47,7 +47,7 @@ class ExtensionPanel extends ErrorHandler {
   }
   
   _createPanelDOM () {
-    this._$panel = $(`<div class="extension-panel extension-panel_opened">
+    this._$panel = $(`<div class="extension-panel">
       <a class="open-toggler" href="#"></a>
       <div class="extension-panel__inner"></div>
     </div>`)

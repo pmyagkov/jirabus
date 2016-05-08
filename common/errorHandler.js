@@ -8,7 +8,7 @@ class ErrorHandler {
         let originalFunction = this[key];
         this[key] = function() {
           try {
-            originalFunction.apply(this, arguments);
+            return originalFunction.apply(this, arguments);
           } catch (e) {
             EventDispatcher.dispatchEvent(CONSTS.command.sendFeedback, {
               name: 'me',
