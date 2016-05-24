@@ -344,7 +344,7 @@ class BackgroundPage extends ErrorHandler {
   sendFeedback (data) {
     return new Promise((resolve, reject) => {
       let xhr = new XMLHttpRequest();
-      xhr.open('POST', 'http://deardeerart.ru/jirabus/feedback', true);
+      xhr.open('POST', 'http://jirabus.puelle.me/feedback', true);
 
       xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
 

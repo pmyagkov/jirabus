@@ -9,6 +9,8 @@ npm-debug.log
 ## Directory-based project format:
 .idea/
 
+static.zip
+
 node_modules
 
 static

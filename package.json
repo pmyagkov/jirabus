@@ -47,7 +47,8 @@
     "test": "karma start test/karma-conf.js --singleRun",
     "test:dev": "karma start test/karma-conf.js --reporters=mocha",
     "watch": "gulp build:css && gulp watch:css",
-    "start": "node server/server.js"
+    "start": "node server/server.js",
+    "archive": "./build/archive.sh"
   },
   "dependencies": {
     "express": "^4.13.4",

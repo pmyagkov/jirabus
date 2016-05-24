@@ -2,7 +2,7 @@
   "manifest_version": 2,
 
   "name": "JIRAbus",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Productivity keyboard shortcut enhancer",
   "background": {
     "scripts": [
